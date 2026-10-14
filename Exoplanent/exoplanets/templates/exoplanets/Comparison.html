@@ -1,0 +1,4201 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Exoplanet Comparison | ExoVision</title>
+
+    <link rel="stylesheet"
+          href="{% static 'exoplanets/css/style.css' %}">
+
+    <style>
+
+        /* =========================================================
+           PAGE
+        ========================================================= */
+
+        :root {
+            --bg: #050914;
+            --panel: rgba(13, 20, 36, 0.92);
+            --panel-2: rgba(18, 27, 47, 0.92);
+            --border: rgba(120, 150, 200, 0.16);
+            --border-bright: rgba(100, 210, 255, 0.28);
+
+            --text: #edf6ff;
+            --muted: #8d9ab0;
+            --soft: #b9c5d8;
+
+            --cyan: #36d9ff;
+            --blue: #4d8dff;
+            --purple: #a66cff;
+            --green: #45e0a1;
+            --orange: #ffb45e;
+            --red: #ff6f91;
+
+            --radius: 20px;
+            --shadow: 0 18px 55px rgba(0, 0, 0, 0.35);
+        }
+
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+
+        body.comparison-body {
+            margin: 0;
+            min-height: 100vh;
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 15% 10%,
+                    rgba(54, 217, 255, 0.10),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 85% 20%,
+                    rgba(166, 108, 255, 0.10),
+                    transparent 30%
+                ),
+                linear-gradient(
+                    135deg,
+                    #03060e 0%,
+                    #07101e 48%,
+                    #030712 100%
+                );
+        }
+
+
+        /* =========================================================
+           SPACE BACKGROUND
+        ========================================================= */
+
+        .space-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+
+        .space-bg::before,
+        .space-bg::after {
+            content: "";
+            position: absolute;
+            width: 320px;
+            height: 320px;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.16;
+        }
+
+
+        .space-bg::before {
+            top: 8%;
+            left: -100px;
+            background: var(--cyan);
+        }
+
+
+        .space-bg::after {
+            right: -120px;
+            bottom: 8%;
+            background: var(--purple);
+        }
+
+
+        /* =========================================================
+           MAIN
+        ========================================================= */
+
+        .comparison-page {
+            width: min(1450px, 94%);
+            margin: 0 auto;
+            padding: 35px 0 70px;
+        }
+
+
+        /* =========================================================
+           HEADER
+        ========================================================= */
+
+        .comparison-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 25px;
+
+            margin-bottom: 28px;
+        }
+
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 45px;
+            height: 45px;
+
+            border: 1px solid var(--border);
+            border-radius: 14px;
+
+            background: rgba(255, 255, 255, 0.035);
+
+            color: var(--text);
+            text-decoration: none;
+
+            font-size: 19px;
+
+            transition: 0.2s ease;
+        }
+
+
+        .back-btn:hover {
+            border-color: var(--border-bright);
+            background: rgba(54, 217, 255, 0.08);
+            transform: translateX(-2px);
+        }
+
+
+        .eyebrow {
+            margin-bottom: 6px;
+
+            color: var(--cyan);
+
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+
+        .comparison-header h1 {
+            margin: 0;
+
+            font-size: clamp(30px, 4vw, 48px);
+            line-height: 1.05;
+            letter-spacing: -1.5px;
+        }
+
+
+        .comparison-header h1 span {
+            color: var(--cyan);
+        }
+
+
+        .header-description {
+            margin: 9px 0 0;
+
+            color: var(--muted);
+
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+
+        .dataset-badge {
+            padding: 10px 15px;
+
+            border: 1px solid rgba(69, 224, 161, 0.25);
+            border-radius: 999px;
+
+            background: rgba(69, 224, 161, 0.07);
+
+            color: var(--green);
+
+            font-size: 12px;
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+
+        /* =========================================================
+           SECTION CARD
+        ========================================================= */
+
+        .section-card {
+            margin-top: 20px;
+
+            padding: 24px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(18, 28, 49, 0.96),
+                    rgba(8, 14, 27, 0.96)
+                );
+
+            box-shadow: var(--shadow);
+        }
+
+
+        .section-heading {
+            margin-bottom: 20px;
+        }
+
+
+        .section-heading h2 {
+            margin: 0 0 5px;
+
+            font-size: 20px;
+        }
+
+
+        .section-heading p {
+            margin: 0;
+
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+
+        /* =========================================================
+           SELECTION
+        ========================================================= */
+
+        .selection-grid {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: end;
+            gap: 18px;
+        }
+
+
+        .selection-box {
+            padding: 20px;
+
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+
+        .selection-box label {
+            display: block;
+            margin-bottom: 9px;
+
+            color: var(--soft);
+
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+
+        .planet-search {
+            width: 100%;
+
+            padding: 14px 15px;
+
+            border: 1px solid rgba(140, 170, 210, 0.18);
+            border-radius: 12px;
+
+            outline: none;
+
+            background: #080f1d;
+
+            color: var(--text);
+
+            font-size: 14px;
+        }
+
+
+        .planet-search:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(54, 217, 255, 0.08);
+        }
+
+
+        .planet-search::placeholder {
+            color: #657289;
+        }
+
+
+        .vs-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 48px;
+            height: 48px;
+
+            border: 1px solid rgba(166, 108, 255, 0.3);
+            border-radius: 50%;
+
+            background: rgba(166, 108, 255, 0.08);
+
+            color: #d6bfff;
+
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+
+            margin-top: 17px;
+        }
+
+
+        .action-btn {
+            border: 1px solid var(--border);
+            border-radius: 11px;
+
+            padding: 11px 17px;
+
+            cursor: pointer;
+
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.045);
+
+            font-size: 13px;
+            font-weight: 700;
+
+            transition: 0.2s ease;
+        }
+
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            border-color: var(--border-bright);
+        }
+
+
+        .action-btn.primary {
+            border-color: rgba(54, 217, 255, 0.3);
+            background: rgba(54, 217, 255, 0.12);
+            color: var(--cyan);
+        }
+
+
+        .action-btn.swap {
+            border-color: rgba(166, 108, 255, 0.3);
+            color: #c9a9ff;
+        }
+
+
+        .action-btn.reset {
+            color: #ff9eb3;
+        }
+
+
+        .selection-message {
+            display: none;
+
+            margin-top: 13px;
+            padding: 10px 13px;
+
+            border-radius: 10px;
+
+            background: rgba(255, 111, 145, 0.08);
+            border: 1px solid rgba(255, 111, 145, 0.18);
+
+            color: #ff9eb3;
+
+            font-size: 12px;
+        }
+
+
+        .selection-message.show {
+            display: block;
+        }
+
+
+        /* =========================================================
+           EMPTY STATE
+        ========================================================= */
+
+        #comparisonResults {
+            display: none;
+        }
+
+
+        #comparisonResults.visible {
+            display: block;
+        }
+
+
+        .empty-state {
+            margin-top: 20px;
+
+            padding: 55px 25px;
+
+            border: 1px dashed rgba(120, 150, 200, 0.22);
+            border-radius: var(--radius);
+
+            background: rgba(255, 255, 255, 0.02);
+
+            text-align: center;
+        }
+
+
+        .empty-icon {
+            font-size: 42px;
+            margin-bottom: 12px;
+        }
+
+
+        .empty-state h2 {
+            margin: 0 0 8px;
+            font-size: 20px;
+        }
+
+
+        .empty-state p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+
+        /* =========================================================
+           PLANET IDENTITY CARDS
+        ========================================================= */
+
+        .planet-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+
+        .planet-card {
+            position: relative;
+            overflow: hidden;
+
+            padding: 24px;
+
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(20, 31, 54, 0.95),
+                    rgba(8, 14, 27, 0.95)
+                );
+
+            box-shadow: var(--shadow);
+        }
+
+
+        .planet-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+
+            height: 2px;
+
+            background: linear-gradient(
+                90deg,
+                var(--cyan),
+                var(--purple)
+            );
+        }
+
+
+        .planet-label {
+            margin-bottom: 10px;
+
+            color: var(--cyan);
+
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+
+        .planet-card h2 {
+            margin: 0;
+
+            font-size: 24px;
+
+            overflow-wrap: anywhere;
+        }
+
+
+        .planet-id {
+            margin-top: 6px;
+
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+
+        .disposition {
+            display: inline-flex;
+
+            margin-top: 15px;
+            padding: 7px 11px;
+
+            border-radius: 999px;
+
+            background: rgba(54, 217, 255, 0.08);
+            border: 1px solid rgba(54, 217, 255, 0.18);
+
+            color: var(--cyan);
+
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+
+        .planet-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+
+            margin-top: 20px;
+        }
+
+
+        .mini-stat {
+            padding: 13px;
+
+            border: 1px solid var(--border);
+            border-radius: 12px;
+
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+
+        .mini-stat span {
+            display: block;
+
+            margin-bottom: 5px;
+
+            color: var(--muted);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+
+        .mini-stat strong {
+            display: block;
+
+            color: var(--text);
+
+            font-size: 13px;
+        }
+
+
+        /* =========================================================
+           GRAPHICAL COMPARISON
+        ========================================================= */
+
+        .graph-section {
+            margin-top: 20px;
+        }
+
+
+        .graph-grid {
+            display: grid;
+            grid-template-columns: 1.25fr 1fr;
+            gap: 18px;
+        }
+
+
+        .chart-card {
+            min-width: 0;
+
+            padding: 20px;
+
+            border: 1px solid var(--border);
+            border-radius: 17px;
+
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+
+            gap: 15px;
+
+            margin-bottom: 14px;
+        }
+
+
+        .chart-header h3 {
+            margin: 0 0 5px;
+            font-size: 16px;
+        }
+
+
+        .chart-header p {
+            margin: 0;
+
+            color: var(--muted);
+
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+            white-space: nowrap;
+        }
+
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+
+        .legend-p1 {
+            background: var(--cyan);
+        }
+
+
+        .legend-p2 {
+            background: var(--purple);
+        }
+
+
+        .bar-chart-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+
+        #comparisonBarChart {
+            display: block;
+
+            width: 100%;
+            min-width: 620px;
+            height: 330px;
+        }
+
+
+        #scatterChart {
+            display: block;
+
+            width: 100%;
+            height: 330px;
+        }
+
+
+        .chart-note {
+            margin-top: 9px;
+
+            color: #6f7d93;
+
+            font-size: 10px;
+            line-height: 1.5;
+        }
+
+
+        /* =========================================================
+           TABLE
+        ========================================================= */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+
+        .comparison-table {
+            width: 100%;
+            min-width: 720px;
+
+            border-collapse: collapse;
+        }
+
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 14px 13px;
+
+            border-bottom: 1px solid var(--border);
+
+            text-align: left;
+        }
+
+
+        .comparison-table th {
+            color: var(--muted);
+
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+
+        .comparison-table td {
+            color: var(--soft);
+            font-size: 13px;
+        }
+
+
+        .comparison-table td strong {
+            color: var(--text);
+        }
+
+
+        .metric-name {
+            color: var(--text) !important;
+            font-weight: 700;
+        }
+
+
+        .difference-cell {
+            color: var(--orange) !important;
+            font-weight: 700;
+        }
+
+
+        /* =========================================================
+           DIFFERENCE BARS
+        ========================================================= */
+
+        .difference-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+
+        .difference-card {
+            padding: 18px;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+
+        .difference-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+
+            margin-bottom: 9px;
+        }
+
+
+        .difference-top strong {
+            font-size: 12px;
+        }
+
+
+        .difference-percent {
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+
+        .difference-track {
+            height: 7px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+
+        .difference-fill {
+            height: 100%;
+            width: 0;
+
+            border-radius: inherit;
+
+            background: linear-gradient(
+                90deg,
+                var(--cyan),
+                var(--purple),
+                var(--orange)
+            );
+
+            transition: width 0.45s ease;
+        }
+
+
+        /* =========================================================
+           ANALYSIS
+        ========================================================= */
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+
+        .analysis-card {
+            padding: 20px;
+
+            border: 1px solid var(--border);
+            border-radius: 17px;
+
+            background: rgba(255, 255, 255, 0.025);
+        }
+
+
+        .analysis-card h3 {
+            margin: 0 0 14px;
+
+            font-size: 15px;
+        }
+
+
+        .analysis-card ul {
+            margin: 0;
+            padding-left: 19px;
+
+            color: var(--soft);
+
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+
+        .summary-card {
+            margin-top: 18px;
+
+            padding: 20px;
+
+            border: 1px solid rgba(54, 217, 255, 0.15);
+            border-radius: 17px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(54, 217, 255, 0.055),
+                    rgba(166, 108, 255, 0.055)
+                );
+        }
+
+
+        .summary-card h3 {
+            margin: 0 0 10px;
+            font-size: 15px;
+        }
+
+
+        .summary-card p {
+            margin: 0;
+
+            color: var(--soft);
+
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+
+        /* =========================================================
+           RESPONSIVE
+        ========================================================= */
+
+        @media (max-width: 1000px) {
+
+            .graph-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 760px) {
+
+            .comparison-page {
+                width: 92%;
+                padding-top: 25px;
+            }
+
+
+            .comparison-header {
+                align-items: flex-start;
+            }
+
+
+            .dataset-badge {
+                display: none;
+            }
+
+
+            .selection-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .vs-badge {
+                margin: -7px auto;
+            }
+
+
+            .planet-grid,
+            .difference-grid,
+            .analysis-grid {
+                grid-template-columns: 1fr;
+            }
+
+
+            .planet-stats {
+                grid-template-columns: 1fr;
+            }
+
+
+            .section-card,
+            .planet-card {
+                padding: 18px;
+            }
+
+
+            .chart-card {
+                padding: 15px;
+            }
+
+        }
+
+
+        @media (max-width: 480px) {
+
+            .comparison-header h1 {
+                font-size: 31px;
+            }
+
+
+            .header-description {
+                font-size: 12px;
+            }
+
+
+            .button-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+            }
+
+
+            .action-btn.primary {
+                grid-column: span 2;
+            }
+
+        }
+
+
+        @media (prefers-reduced-motion: reduce) {
+
+            *,
+            *::before,
+            *::after {
+                scroll-behavior: auto !important;
+                transition: none !important;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body class="comparison-body">
+
+<div class="space-bg"></div>
+
+
+<main class="comparison-page">
+
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+<header class="comparison-header">
+
+    <!-- LEFT SIDE -->
+    <div class="header-left">
+
+
+        <h1>
+              🚀 Exoplanet <span>Comparison</span>
+        </h1>
+
+        <p class="header-description">
+            ⭐ Compare the physical, orbital and observational
+            characteristics of two exoplanets.⭐
+        </p>
+
+    </div>
+
+
+    <!-- RIGHT SIDE -->
+    <div class="header-right">
+
+        <div class="nav-links">
+
+            <a href="{% url 'home' %}">Home</a>
+
+            <a href="{% url 'explorer' %}">Explorer</a>
+
+            <a href="{% url 'visualizations' %}">Visualizations</a>
+
+            <a href="{% url 'comparison' %}" class="active">Comparison</a>
+
+            <a href="{% url 'kepler_summary' %}">Kepler Summary</a>
+
+        </div>
+
+        <div class="dataset-badge">
+            ● Kepler Dataset
+        </div>
+
+    </div>
+
+</header>
+    <!-- =========================================================
+         SELECTION
+    ========================================================== -->
+
+    <section class="section-card">
+
+        <div class="section-heading">
+
+            <h2>
+                Select Two Exoplanets
+            </h2>
+
+            <p>
+                Choose two records from the Kepler dataset to
+                generate a dynamic scientific comparison.
+            </p>
+
+        </div>
+
+
+        <div class="selection-grid">
+
+
+            <!-- PLANET 1 -->
+
+            <div class="selection-box">
+
+                <label for="planet1">
+                    PLANET 1
+                </label>
+
+                <input
+                    id="planet1"
+                    class="planet-search"
+                    list="planet-options"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Search first exoplanet..."
+                    value="{{ selected_planet1|default:'' }}"
+                >
+
+            </div>
+
+
+            <div class="vs-badge">
+                VS
+            </div>
+
+
+            <!-- PLANET 2 -->
+
+            <div class="selection-box">
+
+                <label for="planet2">
+                    PLANET 2
+                </label>
+
+                <input
+                    id="planet2"
+                    class="planet-search"
+                    list="planet-options"
+                    type="text"
+                    autocomplete="off"
+                    placeholder="Search second exoplanet..."
+                    value="{{ selected_planet2|default:'' }}"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- Shared datalist:
+             only one set of options is generated. -->
+
+        <datalist id="planet-options">
+
+            {% for planet in planets %}
+
+                <option value="{{ planet.name }}"></option>
+
+            {% endfor %}
+
+        </datalist>
+
+
+        <div class="button-row">
+
+            <button
+                id="compareBtn"
+                type="button"
+                class="action-btn primary">
+                Compare Planets
+            </button>
+
+            <button
+                id="swapBtn"
+                type="button"
+                class="action-btn swap">
+                ⇄ Swap
+            </button>
+
+            <button
+                id="resetBtn"
+                type="button"
+                class="action-btn reset">
+                ↺ Reset
+            </button>
+
+        </div>
+
+
+        <div
+            id="selectionMessage"
+            class="selection-message">
+        </div>
+
+    </section>
+
+
+
+    <!-- =========================================================
+         EMPTY STATE
+    ========================================================== -->
+
+    <section
+        id="emptyState"
+        class="empty-state">
+
+        <div class="empty-icon">
+            🪐
+        </div>
+
+        <h2>
+            Ready for comparison
+        </h2>
+
+        <p>
+            Select two exoplanets above to view their scientific
+            properties and graphical comparison.
+        </p>
+
+    </section>
+
+
+
+    <!-- =========================================================
+         RESULTS
+    ========================================================== -->
+
+    <section id="comparisonResults">
+
+
+        <!-- =====================================================
+             PLANET IDENTITY
+        ====================================================== -->
+
+        <div class="planet-grid">
+
+
+            <!-- PLANET 1 -->
+
+            <article class="planet-card">
+
+                <div class="planet-label">
+                    Planet 01
+                </div>
+
+                <h2 id="planet1Name">
+                    Not available
+                </h2>
+
+                <div
+                    id="planet1Id"
+                    class="planet-id">
+                    —
+                </div>
+
+                <div
+                    id="planet1Disposition"
+                    class="disposition">
+                    Not available
+                </div>
+
+
+                <div class="planet-stats">
+
+                    <div class="mini-stat">
+
+                        <span>Radius</span>
+
+                        <strong id="p1Radius">
+                            Not available
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mini-stat">
+
+                        <span>Temperature</span>
+
+                        <strong id="p1Temp">
+                            Not available
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mini-stat">
+
+                        <span>Period</span>
+
+                        <strong id="p1Period">
+                            Not available
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+
+
+            <!-- PLANET 2 -->
+
+            <article class="planet-card">
+
+                <div class="planet-label">
+                    Planet 02
+                </div>
+
+                <h2 id="planet2Name">
+                    Not available
+                </h2>
+
+                <div
+                    id="planet2Id"
+                    class="planet-id">
+                    —
+                </div>
+
+                <div
+                    id="planet2Disposition"
+                    class="disposition">
+                    Not available
+                </div>
+
+
+                <div class="planet-stats">
+
+                    <div class="mini-stat">
+
+                        <span>Radius</span>
+
+                        <strong id="p2Radius">
+                            Not available
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mini-stat">
+
+                        <span>Temperature</span>
+
+                        <strong id="p2Temp">
+                            Not available
+                        </strong>
+
+                    </div>
+
+
+                    <div class="mini-stat">
+
+                        <span>Period</span>
+
+                        <strong id="p2Period">
+                            Not available
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+
+
+        <!-- =====================================================
+             GRAPHICAL COMPARISON
+        ====================================================== -->
+
+        <section class="section-card graph-section">
+
+            <div class="section-heading">
+
+                <h2>
+                    📊 Graphical Comparison
+                </h2>
+
+                <p>
+                    Visual comparison of the selected planets using
+                    their available Kepler measurements.
+                </p>
+
+            </div>
+
+
+            <div class="graph-grid">
+
+
+                <!-- =================================================
+                     BAR CHART
+                ================================================== -->
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+
+                        <div>
+
+                            <h3>
+                                Property Comparison
+                            </h3>
+
+                            <p>
+                                Relative magnitude of each recorded
+                                parameter between the two planets.
+                            </p>
+
+                        </div>
+
+
+                        <div class="chart-legend">
+
+                            <span class="legend-item">
+
+                                <span class="legend-dot legend-p1"></span>
+
+                                Planet 1
+
+                            </span>
+
+
+                            <span class="legend-item">
+
+                                <span class="legend-dot legend-p2"></span>
+
+                                Planet 2
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="bar-chart-wrapper">
+
+                        <canvas
+                            id="comparisonBarChart"
+                            width="760"
+                            height="330">
+                        </canvas>
+
+                    </div>
+
+
+                    <div class="chart-note">
+
+                        Values are normalized independently for each
+                        metric because radius, temperature, period
+                        and insolation use different scientific units.
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     SCATTER PLOT
+                ================================================== -->
+
+                <div class="chart-card">
+
+                    <div class="chart-header">
+
+                        <div>
+
+                            <h3>
+                                Radius vs Temperature
+                            </h3>
+
+                            <p>
+                                Position of the selected planets using
+                                planetary radius and equilibrium temperature.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <canvas
+                        id="scatterChart"
+                        width="620"
+                        height="330">
+                    </canvas>
+
+
+                    <div class="chart-note">
+
+                        X-axis: Planetary Radius (Earth radii) ·
+                        Y-axis: Equilibrium Temperature (K)
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             DETAILED TABLE
+        ====================================================== -->
+
+        <section class="section-card">
+
+            <div class="section-heading">
+
+                <h2>
+                    🔬 Detailed Scientific Comparison
+                </h2>
+
+                <p>
+                    Recorded values and calculated differences.
+                </p>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table class="comparison-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Property
+                            </th>
+
+                            <th id="tablePlanet1">
+                                Planet 1
+                            </th>
+
+                            <th id="tablePlanet2">
+                                Planet 2
+                            </th>
+
+                            <th>
+                                Difference
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        <!-- RADIUS -->
+
+                        <tr>
+
+                            <td class="metric-name">
+                                Planetary Radius
+                            </td>
+
+                            <td id="tableRadius1">
+                                Not available
+                            </td>
+
+                            <td id="tableRadius2">
+                                Not available
+                            </td>
+
+                            <td
+                                id="diffRadius"
+                                class="difference-cell">
+                                Not available
+                            </td>
+
+                        </tr>
+
+
+                        <!-- TEMPERATURE -->
+
+                        <tr>
+
+                            <td class="metric-name">
+                                Equilibrium Temperature
+                            </td>
+
+                            <td id="tableTemp1">
+                                Not available
+                            </td>
+
+                            <td id="tableTemp2">
+                                Not available
+                            </td>
+
+                            <td
+                                id="diffTemp"
+                                class="difference-cell">
+                                Not available
+                            </td>
+
+                        </tr>
+
+
+                        <!-- PERIOD -->
+
+                        <tr>
+
+                            <td class="metric-name">
+                                Orbital Period
+                            </td>
+
+                            <td id="tablePeriod1">
+                                Not available
+                            </td>
+
+                            <td id="tablePeriod2">
+                                Not available
+                            </td>
+
+                            <td
+                                id="diffPeriod"
+                                class="difference-cell">
+                                Not available
+                            </td>
+
+                        </tr>
+
+
+                        <!-- INSOLATION -->
+
+                        <tr>
+
+                            <td class="metric-name">
+                                Stellar Insolation
+                            </td>
+
+                            <td id="tableInsol1">
+                                Not available
+                            </td>
+
+                            <td id="tableInsol2">
+                                Not available
+                            </td>
+
+                            <td
+                                id="diffInsol"
+                                class="difference-cell">
+                                Not available
+                            </td>
+
+                        </tr>
+
+
+                        <!-- DISPOSITION -->
+
+                        <tr>
+
+                            <td class="metric-name">
+                                KOI Disposition
+                            </td>
+
+                            <td id="tableDisposition1">
+                                Not available
+                            </td>
+
+                            <td id="tableDisposition2">
+                                Not available
+                            </td>
+
+                            <td>
+                                —
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             DIFFERENCE ANALYSIS
+        ====================================================== -->
+
+        <section class="section-card">
+
+            <div class="section-heading">
+
+                <h2>
+                    📐 Relative Difference
+                </h2>
+
+                <p>
+                    Difference is calculated relative to the larger
+                    absolute recorded value.
+                </p>
+
+            </div>
+
+
+            <div class="difference-grid">
+
+
+                <!-- RADIUS -->
+
+                <div class="difference-card">
+
+                    <div class="difference-top">
+
+                        <strong>
+                            Planetary Radius
+                        </strong>
+
+                        <span
+                            id="radiusPercent"
+                            class="difference-percent">
+                            Not available
+                        </span>
+
+                    </div>
+
+                    <div class="difference-track">
+
+                        <div
+                            id="radiusDifference"
+                            class="difference-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- TEMPERATURE -->
+
+                <div class="difference-card">
+
+                    <div class="difference-top">
+
+                        <strong>
+                            Equilibrium Temperature
+                        </strong>
+
+                        <span
+                            id="tempPercent"
+                            class="difference-percent">
+                            Not available
+                        </span>
+
+                    </div>
+
+                    <div class="difference-track">
+
+                        <div
+                            id="tempDifference"
+                            class="difference-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- PERIOD -->
+
+                <div class="difference-card">
+
+                    <div class="difference-top">
+
+                        <strong>
+                            Orbital Period
+                        </strong>
+
+                        <span
+                            id="periodPercent"
+                            class="difference-percent">
+                            Not available
+                        </span>
+
+                    </div>
+
+                    <div class="difference-track">
+
+                        <div
+                            id="periodDifference"
+                            class="difference-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- INSOLATION -->
+
+                <div class="difference-card">
+
+                    <div class="difference-top">
+
+                        <strong>
+                            Stellar Insolation
+                        </strong>
+
+                        <span
+                            id="insolPercent"
+                            class="difference-percent">
+                            Not available
+                        </span>
+
+                    </div>
+
+                    <div class="difference-track">
+
+                        <div
+                            id="insolDifference"
+                            class="difference-fill">
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             ANALYSIS
+        ====================================================== -->
+
+        <section class="section-card">
+
+            <div class="analysis-grid">
+
+
+                <!-- SIMILARITIES -->
+
+                <div class="analysis-card">
+
+                    <h3>
+                        🟢 Similar Characteristics
+                    </h3>
+
+                    <ul id="similarCharacteristics">
+
+                        <li>
+                            Select two planets to begin analysis.
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+
+                <!-- DIFFERENCES -->
+
+                <div class="analysis-card">
+
+                    <h3>
+                        🟠 Major Differences
+                    </h3>
+
+                    <ul id="majorDifferences">
+
+                        <li>
+                            Select two planets to begin analysis.
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SUMMARY -->
+
+            <div class="summary-card">
+
+                <h3>
+                    🧠 Scientific Comparison Summary
+                </h3>
+
+                <p id="comparisonSummary">
+
+                    Select two exoplanets to generate a factual
+                    comparison summary.
+
+                </p>
+
+            </div>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+
+<!-- =============================================================
+     DJANGO DATA
+============================================================= -->
+
+{{ comparison_data|json_script:"comparison-data" }}
+{{ selected_planet1|json_script:"selected-planet1" }}
+{{ selected_planet2|json_script:"selected-planet2" }}
+
+
+
+<!-- =============================================================
+     JAVASCRIPT
+============================================================= -->
+
+<script>
+
+(() => {
+
+    "use strict";
+
+
+    /* =========================================================
+       HELPERS
+    ========================================================= */
+
+    function readJsonScript(id, fallback) {
+
+        const element = document.getElementById(id);
+
+        if (!element) {
+            return fallback;
+        }
+
+        try {
+
+            return JSON.parse(
+                element.textContent || JSON.stringify(fallback)
+            );
+
+        } catch (error) {
+
+            console.error(
+                `Unable to parse ${id}:`,
+                error
+            );
+
+            return fallback;
+        }
+    }
+
+
+    function numberValue(value) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return null;
+        }
+
+        const number = Number(value);
+
+        return Number.isFinite(number)
+            ? number
+            : null;
+    }
+
+
+    function formatValue(value, decimals = 2) {
+
+        const number = numberValue(value);
+
+        if (number === null) {
+            return "Not available";
+        }
+
+        return number.toLocaleString(
+            undefined,
+            {
+                maximumFractionDigits: decimals
+            }
+        );
+    }
+
+
+    function formatNumberCompact(value) {
+
+        const number = numberValue(value);
+
+        if (number === null) {
+            return "N/A";
+        }
+
+        if (Math.abs(number) >= 1000000) {
+            return `${(number / 1000000).toFixed(1)}M`;
+        }
+
+        if (Math.abs(number) >= 1000) {
+            return `${(number / 1000).toFixed(1)}K`;
+        }
+
+        if (Math.abs(number) >= 100) {
+            return number.toFixed(0);
+        }
+
+        if (Math.abs(number) >= 10) {
+            return number.toFixed(1);
+        }
+
+        return number.toFixed(2);
+    }
+
+
+    function getDifference(a, b) {
+
+        const first = numberValue(a);
+        const second = numberValue(b);
+
+        if (
+            first === null ||
+            second === null
+        ) {
+            return null;
+        }
+
+        const absolute = Math.abs(first - second);
+
+        const maximum = Math.max(
+            Math.abs(first),
+            Math.abs(second)
+        );
+
+        const percentage =
+            maximum === 0
+                ? 0
+                : (absolute / maximum) * 100;
+
+        return {
+            absolute,
+            percentage
+        };
+    }
+
+
+    function setText(id, value) {
+
+        const element = document.getElementById(id);
+
+        if (element) {
+            element.textContent = value;
+        }
+    }
+
+
+    function clamp(value, min, max) {
+
+        return Math.max(
+            min,
+            Math.min(max, value)
+        );
+    }
+
+
+    /* =========================================================
+       DATA
+    ========================================================= */
+
+    const dataElement =
+        document.getElementById("comparison-data");
+
+    let planetData = {};
+
+
+    if (dataElement) {
+
+        try {
+
+            planetData =
+                JSON.parse(
+                    dataElement.textContent || "{}"
+                );
+
+        } catch (error) {
+
+            console.error(
+                "Failed to parse comparison data:",
+                error
+            );
+
+            planetData = {};
+
+        }
+
+    }
+
+
+    const selectedPlanet1 =
+        readJsonScript(
+            "selected-planet1",
+            ""
+        );
+
+
+    const selectedPlanet2 =
+        readJsonScript(
+            "selected-planet2",
+            ""
+        );
+
+
+    /* =========================================================
+       DOM ELEMENTS
+    ========================================================= */
+
+    const planet1Input =
+        document.getElementById("planet1");
+
+    const planet2Input =
+        document.getElementById("planet2");
+
+    const compareBtn =
+        document.getElementById("compareBtn");
+
+    const swapBtn =
+        document.getElementById("swapBtn");
+
+    const resetBtn =
+        document.getElementById("resetBtn");
+
+    const emptyState =
+        document.getElementById("emptyState");
+
+    const comparisonResults =
+        document.getElementById(
+            "comparisonResults"
+        );
+
+    const selectionMessage =
+        document.getElementById(
+            "selectionMessage"
+        );
+
+
+    if (
+        !planet1Input ||
+        !planet2Input ||
+        !compareBtn ||
+        !swapBtn ||
+        !resetBtn ||
+        !emptyState ||
+        !comparisonResults
+    ) {
+
+        console.error(
+            "Comparison page initialization failed: required elements are missing."
+        );
+
+        return;
+    }
+
+
+    /* =========================================================
+       CURRENT PLANETS
+    ========================================================= */
+
+    let currentPlanet1 = "";
+    let currentPlanet2 = "";
+
+
+    /* =========================================================
+       MESSAGE
+    ========================================================= */
+
+    function showMessage(message) {
+
+        if (!selectionMessage) {
+            return;
+        }
+
+        selectionMessage.textContent = message;
+        selectionMessage.classList.add("show");
+    }
+
+
+    function clearMessage() {
+
+        if (!selectionMessage) {
+            return;
+        }
+
+        selectionMessage.textContent = "";
+        selectionMessage.classList.remove("show");
+    }
+
+
+    /* =========================================================
+       VALIDATION
+    ========================================================= */
+
+    function validateSelections() {
+
+        const name1 =
+            planet1Input.value.trim();
+
+        const name2 =
+            planet2Input.value.trim();
+
+
+        if (!name1 || !name2) {
+
+            showMessage(
+                "Please select two exoplanets before comparing."
+            );
+
+            return false;
+        }
+
+
+        if (!planetData[name1]) {
+
+            showMessage(
+                `"${name1}" was not found in the available dataset.`
+            );
+
+            return false;
+        }
+
+
+        if (!planetData[name2]) {
+
+            showMessage(
+                `"${name2}" was not found in the available dataset.`
+            );
+
+            return false;
+        }
+
+
+        if (name1 === name2) {
+
+            showMessage(
+                "Please select two different exoplanets."
+            );
+
+            return false;
+        }
+
+
+        clearMessage();
+
+        return true;
+    }
+
+
+    /* =========================================================
+       PLANET IDENTITY
+    ========================================================= */
+
+    function updateIdentity(
+        planet,
+        prefix
+    ) {
+
+        if (!planet) {
+            return;
+        }
+
+
+        const name =
+            planet.name ||
+            "Not available";
+
+
+        const kepoi =
+            planet.kepoi_name ||
+            "Not available";
+
+
+        const kepid =
+            numberValue(planet.kepid);
+
+
+        let identifier =
+            kepoi;
+
+
+        if (kepid !== null) {
+
+            identifier +=
+                ` • KEPID ${formatValue(kepid, 0)}`;
+
+        }
+
+
+        setText(
+            `${prefix}Name`,
+            name
+        );
+
+
+        setText(
+            `${prefix}Id`,
+            identifier
+        );
+
+
+        setText(
+            `${prefix}Disposition`,
+            planet.koi_disposition ||
+            "Not available"
+        );
+
+
+        setText(
+            prefix === "planet1"
+                ? "p1Radius"
+                : "p2Radius",
+
+            planet.koi_prad !== null &&
+            planet.koi_prad !== undefined
+                ? `${formatValue(planet.koi_prad, 3)} R⊕`
+                : "Not available"
+        );
+
+
+        setText(
+            prefix === "planet1"
+                ? "p1Temp"
+                : "p2Temp",
+
+            planet.koi_teq !== null &&
+            planet.koi_teq !== undefined
+                ? `${formatValue(planet.koi_teq, 0)} K`
+                : "Not available"
+        );
+
+
+        setText(
+            prefix === "planet1"
+                ? "p1Period"
+                : "p2Period",
+
+            planet.koi_period !== null &&
+            planet.koi_period !== undefined
+                ? `${formatValue(planet.koi_period, 3)} days`
+                : "Not available"
+        );
+
+    }
+
+
+    /* =========================================================
+       TABLE
+    ========================================================= */
+
+    function updateTable(
+        planet1,
+        planet2
+    ) {
+
+        setText(
+            "tablePlanet1",
+            planet1.name || "Planet 1"
+        );
+
+
+        setText(
+            "tablePlanet2",
+            planet2.name || "Planet 2"
+        );
+
+
+        const metrics = [
+
+            {
+                a: planet1.koi_prad,
+                b: planet2.koi_prad,
+
+                aId: "tableRadius1",
+                bId: "tableRadius2",
+                diffId: "diffRadius",
+
+                unit: " R⊕",
+                decimals: 3
+            },
+
+            {
+                a: planet1.koi_teq,
+                b: planet2.koi_teq,
+
+                aId: "tableTemp1",
+                bId: "tableTemp2",
+                diffId: "diffTemp",
+
+                unit: " K",
+                decimals: 0
+            },
+
+            {
+                a: planet1.koi_period,
+                b: planet2.koi_period,
+
+                aId: "tablePeriod1",
+                bId: "tablePeriod2",
+                diffId: "diffPeriod",
+
+                unit: " days",
+                decimals: 3
+            },
+
+            {
+                a: planet1.koi_insol,
+                b: planet2.koi_insol,
+
+                aId: "tableInsol1",
+                bId: "tableInsol2",
+                diffId: "diffInsol",
+
+                unit: " Earth flux",
+                decimals: 3
+            }
+
+        ];
+
+
+        metrics.forEach(metric => {
+
+            const a =
+                numberValue(metric.a);
+
+            const b =
+                numberValue(metric.b);
+
+
+            setText(
+                metric.aId,
+                a === null
+                    ? "Not available"
+                    : `${formatValue(a, metric.decimals)}${metric.unit}`
+            );
+
+
+            setText(
+                metric.bId,
+                b === null
+                    ? "Not available"
+                    : `${formatValue(b, metric.decimals)}${metric.unit}`
+            );
+
+
+            const difference =
+                getDifference(a, b);
+
+
+            setText(
+                metric.diffId,
+
+                difference === null
+                    ? "Not available"
+                    : `${formatValue(
+                        difference.absolute,
+                        metric.decimals
+                    )}${metric.unit}`
+            );
+
+        });
+
+
+        setText(
+            "tableDisposition1",
+            planet1.koi_disposition ||
+            "Not available"
+        );
+
+
+        setText(
+            "tableDisposition2",
+            planet2.koi_disposition ||
+            "Not available"
+        );
+
+    }
+
+
+    /* =========================================================
+       DIFFERENCE BARS
+    ========================================================= */
+
+    function updateDifferenceBars(
+        planet1,
+        planet2
+    ) {
+
+        const metrics = [
+
+            {
+                a: planet1.koi_prad,
+                b: planet2.koi_prad,
+
+                fill: "radiusDifference",
+                label: "radiusPercent"
+            },
+
+            {
+                a: planet1.koi_teq,
+                b: planet2.koi_teq,
+
+                fill: "tempDifference",
+                label: "tempPercent"
+            },
+
+            {
+                a: planet1.koi_period,
+                b: planet2.koi_period,
+
+                fill: "periodDifference",
+                label: "periodPercent"
+            },
+
+            {
+                a: planet1.koi_insol,
+                b: planet2.koi_insol,
+
+                fill: "insolDifference",
+                label: "insolPercent"
+            }
+
+        ];
+
+
+        metrics.forEach(metric => {
+
+            const difference =
+                getDifference(
+                    metric.a,
+                    metric.b
+                );
+
+
+            const fill =
+                document.getElementById(
+                    metric.fill
+                );
+
+
+            const label =
+                document.getElementById(
+                    metric.label
+                );
+
+
+            if (!difference) {
+
+                if (fill) {
+                    fill.style.width = "0%";
+                }
+
+                if (label) {
+                    label.textContent =
+                        "Not available";
+                }
+
+                return;
+            }
+
+
+            const percent =
+                Math.min(
+                    100,
+                    difference.percentage
+                );
+
+
+            if (fill) {
+
+                fill.style.width =
+                    `${percent}%`;
+
+            }
+
+
+            if (label) {
+
+                label.textContent =
+                    `${difference.percentage.toFixed(1)}%`;
+
+            }
+
+        });
+
+    }
+
+
+    /* =========================================================
+       GRAPHICS — BAR CHART
+    ========================================================= */
+
+    function drawBarChart(
+        planet1,
+        planet2
+    ) {
+
+        const canvas =
+            document.getElementById(
+                "comparisonBarChart"
+            );
+
+
+        if (!canvas) {
+            return;
+        }
+
+
+        const context =
+            canvas.getContext("2d");
+
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+
+        const dpr =
+            window.devicePixelRatio || 1;
+
+
+        const width =
+            Math.max(
+                rect.width,
+                620
+            );
+
+
+        const height = 330;
+
+
+        canvas.width =
+            width * dpr;
+
+        canvas.height =
+            height * dpr;
+
+
+        context.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+
+
+        context.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        const metrics = [
+
+            {
+                label: "Radius",
+                a: numberValue(planet1.koi_prad),
+                b: numberValue(planet2.koi_prad)
+            },
+
+            {
+                label: "Temperature",
+                a: numberValue(planet1.koi_teq),
+                b: numberValue(planet2.koi_teq)
+            },
+
+            {
+                label: "Period",
+                a: numberValue(planet1.koi_period),
+                b: numberValue(planet2.koi_period)
+            },
+
+            {
+                label: "Insolation",
+                a: numberValue(planet1.koi_insol),
+                b: numberValue(planet2.koi_insol)
+            }
+
+        ];
+
+
+        const padding = {
+
+            left: 55,
+            right: 25,
+            top: 25,
+            bottom: 55
+
+        };
+
+
+        const chartWidth =
+            width -
+            padding.left -
+            padding.right;
+
+
+        const chartHeight =
+            height -
+            padding.top -
+            padding.bottom;
+
+
+        /* Grid */
+
+        context.strokeStyle =
+            "rgba(140,170,210,0.10)";
+
+        context.lineWidth = 1;
+
+
+        for (
+            let i = 0;
+            i <= 4;
+            i++
+        ) {
+
+            const y =
+                padding.top +
+                chartHeight -
+                (chartHeight * i / 4);
+
+
+            context.beginPath();
+
+            context.moveTo(
+                padding.left,
+                y
+            );
+
+            context.lineTo(
+                width - padding.right,
+                y
+            );
+
+            context.stroke();
+
+
+            context.fillStyle =
+                "#66748a";
+
+            context.font =
+                "10px Inter, sans-serif";
+
+            context.textAlign =
+                "right";
+
+            context.fillText(
+                `${i * 25}%`,
+                padding.left - 8,
+                y + 3
+            );
+
+        }
+
+
+        const groupWidth =
+            chartWidth / metrics.length;
+
+
+        metrics.forEach(
+            (metric, index) => {
+
+                const max =
+                    Math.max(
+                        metric.a ?? 0,
+                        metric.b ?? 0
+                    );
+
+
+                const normalizedA =
+                    metric.a !== null &&
+                    max > 0
+                        ? metric.a / max
+                        : 0;
+
+
+                const normalizedB =
+                    metric.b !== null &&
+                    max > 0
+                        ? metric.b / max
+                        : 0;
+
+
+                const center =
+                    padding.left +
+                    groupWidth * index +
+                    groupWidth / 2;
+
+
+                const barWidth =
+                    Math.min(
+                        42,
+                        groupWidth * 0.20
+                    );
+
+
+                const gap = 8;
+
+
+                const heightA =
+                    normalizedA *
+                    chartHeight;
+
+
+                const heightB =
+                    normalizedB *
+                    chartHeight;
+
+
+                /* Planet 1 */
+
+                const xA =
+                    center -
+                    barWidth -
+                    gap / 2;
+
+
+                const yA =
+                    padding.top +
+                    chartHeight -
+                    heightA;
+
+
+                if (metric.a !== null) {
+
+                    context.fillStyle =
+                        "#36d9ff";
+
+
+                    context.beginPath();
+
+                    context.roundRect(
+                        xA,
+                        yA,
+                        barWidth,
+                        heightA,
+                        6
+                    );
+
+                    context.fill();
+
+                }
+
+
+                /* Planet 2 */
+
+                const xB =
+                    center +
+                    gap / 2;
+
+
+                const yB =
+                    padding.top +
+                    chartHeight -
+                    heightB;
+
+
+                if (metric.b !== null) {
+
+                    context.fillStyle =
+                        "#a66cff";
+
+
+                    context.beginPath();
+
+                    context.roundRect(
+                        xB,
+                        yB,
+                        barWidth,
+                        heightB,
+                        6
+                    );
+
+                    context.fill();
+
+                }
+
+
+                /* X labels */
+
+                context.fillStyle =
+                    "#9aa8bd";
+
+                context.font =
+                    "11px Inter, sans-serif";
+
+                context.textAlign =
+                    "center";
+
+
+                context.fillText(
+                    metric.label,
+                    center,
+                    height - 25
+                );
+
+
+                /* Values */
+
+                context.font =
+                    "10px Inter, sans-serif";
+
+
+                if (metric.a !== null) {
+
+                    context.fillStyle =
+                        "#36d9ff";
+
+
+                    context.fillText(
+                        formatNumberCompact(
+                            metric.a
+                        ),
+                        xA + barWidth / 2,
+                        Math.max(
+                            yA - 7,
+                            13
+                        )
+                    );
+
+                }
+
+
+                if (metric.b !== null) {
+
+                    context.fillStyle =
+                        "#a66cff";
+
+
+                    context.fillText(
+                        formatNumberCompact(
+                            metric.b
+                        ),
+                        xB + barWidth / 2,
+                        Math.max(
+                            yB - 7,
+                            13
+                        )
+                    );
+
+                }
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       GRAPHICS — SCATTER PLOT
+    ========================================================= */
+
+    function drawScatterChart(
+        planet1,
+        planet2
+    ) {
+
+        const canvas =
+            document.getElementById(
+                "scatterChart"
+            );
+
+
+        if (!canvas) {
+            return;
+        }
+
+
+        const context =
+            canvas.getContext("2d");
+
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+
+        const dpr =
+            window.devicePixelRatio || 1;
+
+
+        const width =
+            Math.max(
+                rect.width,
+                300
+            );
+
+
+        const height = 330;
+
+
+        canvas.width =
+            width * dpr;
+
+        canvas.height =
+            height * dpr;
+
+
+        context.setTransform(
+            dpr,
+            0,
+            0,
+            dpr,
+            0,
+            0
+        );
+
+
+        context.clearRect(
+            0,
+            0,
+            width,
+            height
+        );
+
+
+        const x1 =
+            numberValue(
+                planet1.koi_prad
+            );
+
+
+        const y1 =
+            numberValue(
+                planet1.koi_teq
+            );
+
+
+        const x2 =
+            numberValue(
+                planet2.koi_prad
+            );
+
+
+        const y2 =
+            numberValue(
+                planet2.koi_teq
+            );
+
+
+        const valuesX =
+            [x1, x2].filter(
+                value => value !== null
+            );
+
+
+        const valuesY =
+            [y1, y2].filter(
+                value => value !== null
+            );
+
+
+        const padding = {
+
+            left: 55,
+            right: 25,
+            top: 25,
+            bottom: 50
+
+        };
+
+
+        const chartWidth =
+            width -
+            padding.left -
+            padding.right;
+
+
+        const chartHeight =
+            height -
+            padding.top -
+            padding.bottom;
+
+
+        /* Missing data */
+
+        if (
+            valuesX.length === 0 ||
+            valuesY.length === 0
+        ) {
+
+            context.fillStyle =
+                "#718096";
+
+            context.font =
+                "13px Inter, sans-serif";
+
+            context.textAlign =
+                "center";
+
+            context.fillText(
+                "Insufficient radius or temperature data",
+                width / 2,
+                height / 2
+            );
+
+            return;
+        }
+
+
+        let minX =
+            Math.min(...valuesX);
+
+
+        let maxX =
+            Math.max(...valuesX);
+
+
+        let minY =
+            Math.min(...valuesY);
+
+
+        let maxY =
+            Math.max(...valuesY);
+
+
+        /* Prevent zero ranges */
+
+        if (minX === maxX) {
+
+            minX -= 1;
+            maxX += 1;
+
+        }
+
+
+        if (minY === maxY) {
+
+            minY -= 50;
+            maxY += 50;
+
+        }
+
+
+        const xPadding =
+            (maxX - minX) * 0.15;
+
+
+        const yPadding =
+            (maxY - minY) * 0.15;
+
+
+        minX -= xPadding;
+        maxX += xPadding;
+
+        minY -= yPadding;
+        maxY += yPadding;
+
+
+        function mapX(value) {
+
+            return (
+                padding.left +
+                (
+                    (value - minX) /
+                    (maxX - minX)
+                ) *
+                chartWidth
+            );
+
+        }
+
+
+        function mapY(value) {
+
+            return (
+                padding.top +
+                chartHeight -
+                (
+                    (value - minY) /
+                    (maxY - minY)
+                ) *
+                chartHeight
+            );
+
+        }
+
+
+        /* Grid */
+
+        context.strokeStyle =
+            "rgba(140,170,210,0.10)";
+
+        context.lineWidth = 1;
+
+
+        for (
+            let i = 0;
+            i <= 4;
+            i++
+        ) {
+
+            const y =
+                padding.top +
+                chartHeight -
+                (chartHeight * i / 4);
+
+
+            context.beginPath();
+
+            context.moveTo(
+                padding.left,
+                y
+            );
+
+            context.lineTo(
+                width - padding.right,
+                y
+            );
+
+            context.stroke();
+
+
+            const yValue =
+                minY +
+                (
+                    (maxY - minY) *
+                    i / 4
+                );
+
+
+            context.fillStyle =
+                "#65738a";
+
+            context.font =
+                "9px Inter, sans-serif";
+
+            context.textAlign =
+                "right";
+
+            context.fillText(
+                formatNumberCompact(yValue),
+                padding.left - 8,
+                y + 3
+            );
+
+        }
+
+
+        for (
+            let i = 0;
+            i <= 4;
+            i++
+        ) {
+
+            const x =
+                padding.left +
+                chartWidth * i / 4;
+
+
+            context.beginPath();
+
+            context.moveTo(
+                x,
+                padding.top
+            );
+
+            context.lineTo(
+                x,
+                padding.top + chartHeight
+            );
+
+            context.stroke();
+
+
+            const xValue =
+                minX +
+                (
+                    (maxX - minX) *
+                    i / 4
+                );
+
+
+            context.fillStyle =
+                "#65738a";
+
+            context.font =
+                "9px Inter, sans-serif";
+
+            context.textAlign =
+                "center";
+
+            context.fillText(
+                formatNumberCompact(xValue),
+                x,
+                height - 25
+            );
+
+        }
+
+
+        /* Axis labels */
+
+        context.fillStyle =
+            "#8795aa";
+
+        context.font =
+            "10px Inter, sans-serif";
+
+        context.textAlign =
+            "center";
+
+        context.fillText(
+            "Planetary Radius (R⊕)",
+            padding.left +
+            chartWidth / 2,
+            height - 7
+        );
+
+
+        context.save();
+
+        context.translate(
+            13,
+            padding.top +
+            chartHeight / 2
+        );
+
+        context.rotate(-Math.PI / 2);
+
+        context.fillText(
+            "Equilibrium Temperature (K)",
+            0,
+            0
+        );
+
+        context.restore();
+
+
+        function drawPoint(
+            x,
+            y,
+            color,
+            label
+        ) {
+
+            if (
+                x === null ||
+                y === null
+            ) {
+                return;
+            }
+
+
+            const px =
+                mapX(x);
+
+
+            const py =
+                mapY(y);
+
+
+            /* Glow */
+
+            context.beginPath();
+
+            context.arc(
+                px,
+                py,
+                12,
+                0,
+                Math.PI * 2
+            );
+
+
+            context.fillStyle =
+                color === "cyan"
+                    ? "rgba(54,217,255,0.12)"
+                    : "rgba(166,108,255,0.12)";
+
+            context.fill();
+
+
+            /* Point */
+
+            context.beginPath();
+
+            context.arc(
+                px,
+                py,
+                6,
+                0,
+                Math.PI * 2
+            );
+
+
+            context.fillStyle =
+                color === "cyan"
+                    ? "#36d9ff"
+                    : "#a66cff";
+
+            context.fill();
+
+
+            /* Label */
+
+            context.fillStyle =
+                "#dce8f7";
+
+            context.font =
+                "10px Inter, sans-serif";
+
+            context.textAlign =
+                "left";
+
+            context.fillText(
+                label,
+                px + 10,
+                py - 8
+            );
+
+        }
+
+
+        drawPoint(
+            x1,
+            y1,
+            "cyan",
+            "Planet 1"
+        );
+
+
+        drawPoint(
+            x2,
+            y2,
+            "purple",
+            "Planet 2"
+        );
+
+    }
+
+
+    /* =========================================================
+       DRAW ALL CHARTS
+    ========================================================= */
+
+    function updateCharts(
+        planet1,
+        planet2
+    ) {
+
+        drawBarChart(
+            planet1,
+            planet2
+        );
+
+
+        drawScatterChart(
+            planet1,
+            planet2
+        );
+
+    }
+
+
+    /* =========================================================
+       ANALYSIS
+    ========================================================= */
+
+    function updateAnalysis(
+        planet1,
+        planet2
+    ) {
+
+        const similarities =
+            document.getElementById(
+                "similarCharacteristics"
+            );
+
+
+        const differences =
+            document.getElementById(
+                "majorDifferences"
+            );
+
+
+        const similarityItems = [];
+        const differenceItems = [];
+
+
+        const metrics = [
+
+            {
+                name: "planetary radius",
+                a: planet1.koi_prad,
+                b: planet2.koi_prad,
+                tolerance: 10
+            },
+
+            {
+                name: "equilibrium temperature",
+                a: planet1.koi_teq,
+                b: planet2.koi_teq,
+                tolerance: 10
+            },
+
+            {
+                name: "orbital period",
+                a: planet1.koi_period,
+                b: planet2.koi_period,
+                tolerance: 10
+            },
+
+            {
+                name: "stellar insolation",
+                a: planet1.koi_insol,
+                b: planet2.koi_insol,
+                tolerance: 10
+            }
+
+        ];
+
+
+        metrics.forEach(metric => {
+
+            const difference =
+                getDifference(
+                    metric.a,
+                    metric.b
+                );
+
+
+            if (!difference) {
+                return;
+            }
+
+
+            if (
+                difference.percentage <=
+                metric.tolerance
+            ) {
+
+                similarityItems.push(
+                    `The two planets have relatively similar ${metric.name} values.`
+                );
+
+            } else {
+
+                differenceItems.push(
+                    `${capitalize(metric.name)} differs by ${difference.percentage.toFixed(1)}%.`
+                );
+
+            }
+
+        });
+
+
+        if (
+            planet1.koi_disposition &&
+            planet2.koi_disposition &&
+            planet1.koi_disposition ===
+            planet2.koi_disposition
+        ) {
+
+            similarityItems.push(
+                `Both records have the "${planet1.koi_disposition}" KOI disposition.`
+            );
+
+        } else if (
+            planet1.koi_disposition &&
+            planet2.koi_disposition
+        ) {
+
+            differenceItems.push(
+                `The KOI dispositions are "${planet1.koi_disposition}" and "${planet2.koi_disposition}".`
+            );
+
+        }
+
+
+        if (similarities) {
+
+            similarities.innerHTML = "";
+
+            if (similarityItems.length === 0) {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent =
+                    "No close similarities were identified from the available numeric values.";
+
+                similarities.appendChild(li);
+
+            } else {
+
+                similarityItems.forEach(
+                    item => {
+
+                        const li =
+                            document.createElement("li");
+
+                        li.textContent = item;
+
+                        similarities.appendChild(li);
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        if (differences) {
+
+            differences.innerHTML = "";
+
+            if (differenceItems.length === 0) {
+
+                const li =
+                    document.createElement("li");
+
+                li.textContent =
+                    "No major differences were identified from the available values.";
+
+                differences.appendChild(li);
+
+            } else {
+
+                differenceItems
+                    .sort((a, b) =>
+                        b.localeCompare(a)
+                    )
+                    .slice(0, 4)
+                    .forEach(item => {
+
+                        const li =
+                            document.createElement("li");
+
+                        li.textContent = item;
+
+                        differences.appendChild(li);
+
+                    });
+
+            }
+
+        }
+
+
+        updateSummary(
+            planet1,
+            planet2
+        );
+
+    }
+
+
+    function capitalize(value) {
+
+        if (!value) {
+            return value;
+        }
+
+        return value.charAt(0).toUpperCase() +
+               value.slice(1);
+
+    }
+
+
+    /* =========================================================
+       SUMMARY
+    ========================================================= */
+
+    function updateSummary(
+        planet1,
+        planet2
+    ) {
+
+        const summary =
+            document.getElementById(
+                "comparisonSummary"
+            );
+
+
+        if (!summary) {
+            return;
+        }
+
+
+        const statements = [];
+
+
+        const comparisons = [
+
+            {
+                name: "planetary radius",
+                a: planet1.koi_prad,
+                b: planet2.koi_prad,
+                unit: " R⊕",
+                decimals: 3
+            },
+
+            {
+                name: "equilibrium temperature",
+                a: planet1.koi_teq,
+                b: planet2.koi_teq,
+                unit: " K",
+                decimals: 0
+            },
+
+            {
+                name: "orbital period",
+                a: planet1.koi_period,
+                b: planet2.koi_period,
+                unit: " days",
+                decimals: 3
+            },
+
+            {
+                name: "stellar insolation",
+                a: planet1.koi_insol,
+                b: planet2.koi_insol,
+                unit: " Earth flux",
+                decimals: 3
+            }
+
+        ];
+
+
+        comparisons.forEach(metric => {
+
+            const a =
+                numberValue(metric.a);
+
+            const b =
+                numberValue(metric.b);
+
+
+            if (
+                a === null ||
+                b === null
+            ) {
+                return;
+            }
+
+
+            if (a > b) {
+
+                statements.push(
+                    `${planet1.name} has a higher recorded ${metric.name} (${formatValue(a, metric.decimals)}${metric.unit}) than ${planet2.name} (${formatValue(b, metric.decimals)}${metric.unit}).`
+                );
+
+            } else if (b > a) {
+
+                statements.push(
+                    `${planet2.name} has a higher recorded ${metric.name} (${formatValue(b, metric.decimals)}${metric.unit}) than ${planet1.name} (${formatValue(a, metric.decimals)}${metric.unit}).`
+                );
+
+            } else {
+
+                statements.push(
+                    `Both planets have the same recorded ${metric.name} (${formatValue(a, metric.decimals)}${metric.unit}).`
+                );
+
+            }
+
+        });
+
+
+        if (statements.length === 0) {
+
+            summary.textContent =
+                "There is insufficient numeric data to generate a detailed comparison for these two records.";
+
+            return;
+        }
+
+
+        summary.textContent =
+            statements.join(" ");
+
+    }
+
+
+    /* =========================================================
+       MAIN COMPARISON
+    ========================================================= */
+
+    function renderComparison() {
+
+        if (!validateSelections()) {
+
+            emptyState.style.display =
+                "block";
+
+            comparisonResults.classList.remove(
+                "visible"
+            );
+
+            return;
+
+        }
+
+
+        currentPlanet1 =
+            planet1Input.value.trim();
+
+
+        currentPlanet2 =
+            planet2Input.value.trim();
+
+
+        const planet1 =
+            planetData[currentPlanet1];
+
+
+        const planet2 =
+            planetData[currentPlanet2];
+
+
+        updateIdentity(
+            planet1,
+            "planet1"
+        );
+
+
+        updateIdentity(
+            planet2,
+            "planet2"
+        );
+
+
+        updateTable(
+            planet1,
+            planet2
+        );
+
+
+        updateDifferenceBars(
+            planet1,
+            planet2
+        );
+
+
+        updateCharts(
+            planet1,
+            planet2
+        );
+
+
+        updateAnalysis(
+            planet1,
+            planet2
+        );
+
+
+        emptyState.style.display =
+            "none";
+
+
+        comparisonResults.classList.add(
+            "visible"
+        );
+
+
+        /*
+         * Wait one frame so canvas dimensions are
+         * correct after the result section becomes visible.
+         */
+
+        requestAnimationFrame(() => {
+
+            updateCharts(
+                planet1,
+                planet2
+            );
+
+        });
+
+    }
+
+
+    /* =========================================================
+       EVENTS
+    ========================================================= */
+
+    compareBtn.addEventListener(
+        "click",
+        renderComparison
+    );
+
+
+    swapBtn.addEventListener(
+        "click",
+        () => {
+
+            const first =
+                planet1Input.value;
+
+
+            planet1Input.value =
+                planet2Input.value;
+
+
+            planet2Input.value =
+                first;
+
+
+            clearMessage();
+
+
+            if (
+                planet1Input.value &&
+                planet2Input.value
+            ) {
+
+                renderComparison();
+
+            }
+
+        }
+    );
+
+
+    resetBtn.addEventListener(
+        "click",
+        () => {
+
+            planet1Input.value = "";
+            planet2Input.value = "";
+
+            currentPlanet1 = "";
+            currentPlanet2 = "";
+
+            clearMessage();
+
+
+            comparisonResults.classList.remove(
+                "visible"
+            );
+
+
+            emptyState.style.display =
+                "block";
+
+
+            /* Reset chart canvases */
+
+            const barCanvas =
+                document.getElementById(
+                    "comparisonBarChart"
+                );
+
+
+            const scatterCanvas =
+                document.getElementById(
+                    "scatterChart"
+                );
+
+
+            if (barCanvas) {
+
+                const ctx =
+                    barCanvas.getContext("2d");
+
+                ctx.clearRect(
+                    0,
+                    0,
+                    barCanvas.width,
+                    barCanvas.height
+                );
+
+            }
+
+
+            if (scatterCanvas) {
+
+                const ctx =
+                    scatterCanvas.getContext("2d");
+
+                ctx.clearRect(
+                    0,
+                    0,
+                    scatterCanvas.width,
+                    scatterCanvas.height
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Automatically update when both inputs
+     * contain valid planets.
+     */
+
+    planet1Input.addEventListener(
+        "change",
+        () => {
+
+            if (
+                planet1Input.value &&
+                planet2Input.value
+            ) {
+
+                renderComparison();
+
+            }
+
+        }
+    );
+
+
+    planet2Input.addEventListener(
+        "change",
+        () => {
+
+            if (
+                planet1Input.value &&
+                planet2Input.value
+            ) {
+
+                renderComparison();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Enter key support.
+     */
+
+    planet1Input.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                renderComparison();
+
+            }
+
+        }
+    );
+
+
+    planet2Input.addEventListener(
+        "keydown",
+        event => {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                renderComparison();
+
+            }
+
+        }
+    );
+
+
+    /*
+     * Redraw charts when browser/window size changes.
+     */
+
+    let resizeTimer;
+
+
+    window.addEventListener(
+        "resize",
+        () => {
+
+            clearTimeout(resizeTimer);
+
+
+            resizeTimer =
+                setTimeout(() => {
+
+                    if (
+                        comparisonResults.classList.contains(
+                            "visible"
+                        )
+                    ) {
+
+                        const planet1 =
+                            planetData[
+                                currentPlanet1
+                            ];
+
+
+                        const planet2 =
+                            planetData[
+                                currentPlanet2
+                            ];
+
+
+                        if (
+                            planet1 &&
+                            planet2
+                        ) {
+
+                            updateCharts(
+                                planet1,
+                                planet2
+                            );
+
+                        }
+
+                    }
+
+                }, 150);
+
+        }
+    );
+
+
+    /* =========================================================
+       INITIAL DJANGO SELECTION
+    ========================================================= */
+
+    if (
+        selectedPlanet1 &&
+        selectedPlanet2 &&
+        planetData[selectedPlanet1] &&
+        planetData[selectedPlanet2] &&
+        selectedPlanet1 !== selectedPlanet2
+    ) {
+
+        planet1Input.value =
+            selectedPlanet1;
+
+
+        planet2Input.value =
+            selectedPlanet2;
+
+
+        renderComparison();
+
+    }
+
+
+})();
+</script>
+
+
+</body>
+</html>

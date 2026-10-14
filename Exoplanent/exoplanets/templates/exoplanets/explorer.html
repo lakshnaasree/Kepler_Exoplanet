@@ -1,0 +1,1176 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ExoPlanet | Explorer</title>
+
+    <style>
+        :root {
+            --bg: #070b18;
+            --panel: rgba(16, 23, 46, 0.92);
+            --panel-2: #0d142b;
+            --border: rgba(255,255,255,.09);
+            --text: #edf2ff;
+            --muted: #8d98ae;
+            --accent: #8275ff;
+            --accent-2: #42d9ff;
+            --success: #50e4a3;
+            --warning: #ffd166;
+            --danger: #ff7281;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            background:
+                radial-gradient(
+                    circle at 15% 10%,
+                    rgba(130,117,255,.15),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 85% 20%,
+                    rgba(66,217,255,.10),
+                    transparent 28%
+                ),
+                var(--bg);
+        }
+
+        a {
+            color: inherit;
+        }
+
+        .navbar {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            border-bottom: 1px solid var(--border);
+            background: rgba(7, 11, 24, .84);
+            backdrop-filter: blur(18px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: 900;
+            letter-spacing: -.5px;
+        }
+
+        .logo span {
+            color: var(--accent);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 26px;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 700;
+            transition: .2s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links .active {
+            color: white;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1550px;
+            margin: auto;
+            padding: 42px 0 70px;
+        }
+
+        .hero {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 2.2px;
+            margin-bottom: 9px;
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: clamp(34px, 5vw, 52px);
+            line-height: 1.05;
+            letter-spacing: -1.5px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(
+                90deg,
+                #9a8dff,
+                #42d9ff
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            max-width: 850px;
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        /* -------------------------------------------------- */
+        /* ERROR */
+        /* -------------------------------------------------- */
+
+        .error {
+            margin-bottom: 22px;
+            padding: 18px 20px;
+            border: 1px solid rgba(255,114,129,.25);
+            border-radius: 15px;
+            color: #ffb3bd;
+            background: rgba(255,70,90,.08);
+        }
+
+        /* -------------------------------------------------- */
+        /* STAT CARDS */
+        /* -------------------------------------------------- */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .stat {
+            position: relative;
+            overflow: hidden;
+            padding: 21px;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: var(--panel);
+        }
+
+        .stat::after {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            right: -35px;
+            bottom: -35px;
+            border-radius: 50%;
+            background: rgba(130,117,255,.10);
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -.5px;
+        }
+
+        /* -------------------------------------------------- */
+        /* FILTER PANEL */
+        /* -------------------------------------------------- */
+
+        .filter-card {
+            margin-bottom: 22px;
+            padding: 22px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel);
+        }
+
+        .filter-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 17px;
+        }
+
+        .filter-heading h2 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .filter-heading small {
+            color: var(--muted);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        input,
+        select {
+            width: 100%;
+            min-height: 44px;
+            padding: 11px 13px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            outline: none;
+            background: #0a1022;
+            color: white;
+            font: inherit;
+        }
+
+        input::placeholder {
+            color: #5f6a82;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(130,117,255,.13);
+        }
+
+        .range-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .range-title {
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .range {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 17px;
+        }
+
+        .btn {
+            min-height: 42px;
+            padding: 10px 18px;
+            border: 0;
+            border-radius: 10px;
+            text-decoration: none;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 800;
+            transition: transform .15s ease, opacity .15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            opacity: .92;
+        }
+
+        .btn-primary {
+            color: white;
+            background: linear-gradient(
+                135deg,
+                #7568ed,
+                #6559d9
+            );
+        }
+
+        .btn-secondary {
+            color: #dbe2f0;
+            background: #252d46;
+        }
+
+        /* -------------------------------------------------- */
+        /* DATA TABLE */
+        /* -------------------------------------------------- */
+
+        .table-card {
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--panel);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding: 19px 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-header h2 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .result-count {
+            color: var(--muted);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .table-wrapper {
+            overflow: auto;
+            max-height: 68vh;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1200px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 13px;
+            border-bottom: 1px solid var(--border);
+            background: #0d142b;
+            color: #aab3c8;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: .4px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 12px 13px;
+            border-bottom: 1px solid rgba(255,255,255,.045);
+            color: #dbe2ef;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background .15s ease;
+        }
+
+        tbody tr:hover {
+            background: rgba(130,117,255,.065);
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: .3px;
+        }
+
+        .confirmed {
+            color: var(--success);
+            background: rgba(45,220,145,.12);
+        }
+
+        .candidate {
+            color: var(--warning);
+            background: rgba(255,203,79,.12);
+        }
+
+        .false-positive {
+            color: var(--danger);
+            background: rgba(255,90,110,.12);
+        }
+
+        .empty-state {
+            padding: 55px 20px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state strong {
+            display: block;
+            margin-bottom: 8px;
+            color: white;
+            font-size: 16px;
+        }
+
+        /* -------------------------------------------------- */
+        /* PAGINATION */
+        /* -------------------------------------------------- */
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            padding: 20px;
+        }
+
+        .pagination a,
+        .pagination span {
+            min-width: 38px;
+            padding: 9px 12px;
+            border-radius: 9px;
+            text-align: center;
+            text-decoration: none;
+            color: #b6bfd0;
+            background: #151d35;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .pagination a:hover {
+            color: white;
+            background: #252e4c;
+        }
+
+        .pagination .current {
+            color: white;
+            background: var(--accent);
+        }
+
+        .pagination .disabled {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+        /* -------------------------------------------------- */
+        /* RESPONSIVE */
+        /* -------------------------------------------------- */
+
+        @media (max-width: 1050px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .filters {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .range-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 13px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            .container {
+                width: 92%;
+                padding-top: 30px;
+            }
+
+            .stats,
+            .filters,
+            .range-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-header,
+            .filter-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar">
+    <div class="logo">
+        Exo<span>Planet</span>
+    </div>
+
+    <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'explorer' %}" class="active">Explorer</a>
+        <a href="{% url 'visualizations' %}">Visualizations</a>
+       
+    </div>
+</nav>
+
+
+<main class="container">
+
+    <!-- ================================================= -->
+    <!-- HERO -->
+    <!-- ================================================= -->
+
+    <section class="hero">
+        <div class="eyebrow">
+            KEPLER DATA EXPLORER
+        </div>
+
+        <h1>
+            Explore <span class="gradient-text">Exoplanets</span>
+        </h1>
+
+        <p>
+            Search, filter and inspect the Kepler exoplanet
+            catalogue directly from your Django application.
+            The table is paginated so thousands of records remain
+            fast and easy to explore.
+        </p>
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- ERROR -->
+    <!-- ================================================= -->
+
+    {% if error %}
+        <div class="error">
+            <strong>Dataset error:</strong>
+            {{ error }}
+        </div>
+    {% endif %}
+
+
+    <!-- ================================================= -->
+    <!-- STATISTICS -->
+    <!-- ================================================= -->
+
+    <section class="stats">
+
+        <div class="stat">
+            <div class="stat-label">TOTAL OBJECTS</div>
+            <div class="stat-value">
+                {{ total_objects|default:0 }}
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-label">CONFIRMED</div>
+            <div class="stat-value">
+                {{ confirmed|default:0 }}
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-label">CANDIDATES</div>
+            <div class="stat-value">
+                {{ candidates|default:0 }}
+            </div>
+        </div>
+
+        <div class="stat">
+            <div class="stat-label">FALSE POSITIVE</div>
+            <div class="stat-value">
+                {{ false_positive|default:0 }}
+            </div>
+        </div>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- FILTERS -->
+    <!-- ================================================= -->
+
+    <section class="filter-card">
+
+        <div class="filter-heading">
+            <div>
+                <h2>Search &amp; Filter Dataset</h2>
+            </div>
+
+            <small>
+                {{ filtered_count|default:0 }} records match
+            </small>
+        </div>
+
+
+        <form method="get" action="{% url 'explorer' %}">
+
+            <div class="filters">
+
+                <!-- Search -->
+                <div class="field">
+                    <label for="search">
+                        SEARCH
+                    </label>
+
+                    <input
+                        id="search"
+                        type="text"
+                        name="search"
+                        value="{{ search_query|default:'' }}"
+                        placeholder="e.g. Kepler, KOI, confirmed..."
+                        autocomplete="off"
+                    >
+                </div>
+
+
+                <!-- Disposition -->
+                <div class="field">
+                    <label for="disposition">
+                        DISPOSITION
+                    </label>
+
+                    <select
+                        id="disposition"
+                        name="disposition"
+                    >
+                        <option value="">
+                            All dispositions
+                        </option>
+
+                        <option
+                            value="CONFIRMED"
+                            {% if selected_disposition == "CONFIRMED" %}
+                                selected
+                            {% endif %}
+                        >
+                            Confirmed
+                        </option>
+
+                        <option
+                            value="CANDIDATE"
+                            {% if selected_disposition == "CANDIDATE" %}
+                                selected
+                            {% endif %}
+                        >
+                            Candidate
+                        </option>
+
+                        <option
+                            value="FALSE POSITIVE"
+                            {% if selected_disposition == "FALSE POSITIVE" %}
+                                selected
+                            {% endif %}
+                        >
+                            False Positive
+                        </option>
+                    </select>
+                </div>
+
+
+                <!-- Radius category -->
+                <div class="field">
+                    <label for="radius_type">
+                        PLANET RADIUS
+                    </label>
+
+                    <select
+                        id="radius_type"
+                        name="radius_type"
+                    >
+                        <option value="">
+                            All sizes
+                        </option>
+
+                        <option
+                            value="small"
+                            {% if radius_type == "small" %}
+                                selected
+                            {% endif %}
+                        >
+                            Small &lt; 1 R⊕
+                        </option>
+
+                        <option
+                            value="medium"
+                            {% if radius_type == "medium" %}
+                                selected
+                            {% endif %}
+                        >
+                            Medium 1–2 R⊕
+                        </option>
+
+                        <option
+                            value="large"
+                            {% if radius_type == "large" %}
+                                selected
+                            {% endif %}
+                        >
+                            Large &gt; 2 R⊕
+                        </option>
+                    </select>
+                </div>
+
+
+                <!-- Temperature category -->
+                <div class="field">
+                    <label for="temperature_type">
+                        TEMPERATURE
+                    </label>
+
+                    <select
+                        id="temperature_type"
+                        name="temperature_type"
+                    >
+                        <option value="">
+                            All temperatures
+                        </option>
+
+                        <option
+                            value="cold"
+                            {% if temperature_type == "cold" %}
+                                selected
+                            {% endif %}
+                        >
+                            Cold &lt; 300 K
+                        </option>
+
+                        <option
+                            value="habitable"
+                            {% if temperature_type == "habitable" %}
+                                selected
+                            {% endif %}
+                        >
+                            300–500 K
+                        </option>
+
+                        <option
+                            value="hot"
+                            {% if temperature_type == "hot" %}
+                                selected
+                            {% endif %}
+                        >
+                            Hot &gt; 500 K
+                        </option>
+                    </select>
+                </div>
+
+            </div>
+
+
+            <!-- Numeric ranges -->
+            <div class="range-grid">
+
+                <div>
+                    <div class="range-title">
+                        PLANET RADIUS (R⊕)
+                    </div>
+
+                    <div class="range">
+                        <input
+                            type="number"
+                            step="any"
+                            name="radius_min"
+                            value="{{ radius_min|default:'' }}"
+                            placeholder="Min"
+                        >
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="radius_max"
+                            value="{{ radius_max|default:'' }}"
+                            placeholder="Max"
+                        >
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="range-title">
+                        EQUILIBRIUM TEMP (K)
+                    </div>
+
+                    <div class="range">
+                        <input
+                            type="number"
+                            step="any"
+                            name="teq_min"
+                            value="{{ teq_min|default:'' }}"
+                            placeholder="Min"
+                        >
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="teq_max"
+                            value="{{ teq_max|default:'' }}"
+                            placeholder="Max"
+                        >
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="range-title">
+                        ORBITAL PERIOD (DAYS)
+                    </div>
+
+                    <div class="range">
+                        <input
+                            type="number"
+                            step="any"
+                            name="period_min"
+                            value="{{ period_min|default:'' }}"
+                            placeholder="Min"
+                        >
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="period_max"
+                            value="{{ period_max|default:'' }}"
+                            placeholder="Max"
+                        >
+                    </div>
+                </div>
+
+
+                <div>
+                    <div class="range-title">
+                        KEPLER MAGNITUDE
+                    </div>
+
+                    <div class="range">
+                        <input
+                            type="number"
+                            step="any"
+                            name="mag_min"
+                            value="{{ mag_min|default:'' }}"
+                            placeholder="Min"
+                        >
+
+                        <input
+                            type="number"
+                            step="any"
+                            name="mag_max"
+                            value="{{ mag_max|default:'' }}"
+                            placeholder="Max"
+                        >
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Apply Filters
+                </button>
+
+                <a
+                    href="{% url 'explorer' %}"
+                    class="btn btn-secondary"
+                >
+                    Clear
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- ================================================= -->
+    <!-- DATA TABLE -->
+    <!-- ================================================= -->
+
+    <section class="table-card">
+
+        <div class="table-header">
+
+            <h2>
+                Exoplanet Dataset
+            </h2>
+
+            <div class="result-count">
+                Showing
+                {% if page_obj %}
+                    {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                {% else %}
+                    0
+                {% endif %}
+                of {{ filtered_count|default:0 }}
+            </div>
+
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        {% for column in columns %}
+                            <th>
+                                {{ column|upper }}
+                            </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    {% if page_obj %}
+
+                        {% for row in page_obj %}
+
+                            <tr>
+
+                                {% for value in row %}
+
+                                    <td>
+
+                                        {% if columns|length > forloop.counter0 %}
+
+                                            {% with column=columns|slice:forloop.counter0|first %}
+
+                                                {% if column == "koi_disposition" %}
+
+                                                    {% if value == "CONFIRMED" %}
+                                                        <span class="status confirmed">
+                                                            CONFIRMED
+                                                        </span>
+
+                                                    {% elif value == "CANDIDATE" %}
+                                                        <span class="status candidate">
+                                                            CANDIDATE
+                                                        </span>
+
+                                                    {% elif value == "FALSE POSITIVE" %}
+                                                        <span class="status false-positive">
+                                                            FALSE POSITIVE
+                                                        </span>
+
+                                                    {% else %}
+                                                        {{ value|default:"—" }}
+                                                    {% endif %}
+
+                                                {% else %}
+
+                                                    {{ value|default:"—" }}
+
+                                                {% endif %}
+
+                                            {% endwith %}
+
+                                        {% else %}
+                                            {{ value|default:"—" }}
+                                        {% endif %}
+
+                                    </td>
+
+                                {% endfor %}
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+                                <td
+                                    colspan="20"
+                                    class="empty-state"
+                                >
+                                    <strong>
+                                        No exoplanets found
+                                    </strong>
+
+                                    Try changing or clearing
+                                    your search and filters.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+                            <td
+                                colspan="20"
+                                class="empty-state"
+                            >
+                                <strong>
+                                    Dataset unavailable
+                                </strong>
+
+                                Please check the Django server
+                                dataset-loading message.
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- PAGINATION -->
+        <!-- ================================================= -->
+
+        {% if page_obj and page_obj.paginator.num_pages > 1 %}
+
+            <div class="pagination">
+
+                {% if page_obj.has_previous %}
+
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}"
+                        class="page-link"
+                        data-page="{{ page_obj.previous_page_number }}"
+                    >
+                        ← Previous
+                    </a>
+
+                {% else %}
+
+                    <span class="disabled">
+                        ← Previous
+                    </span>
+
+                {% endif %}
+
+
+                {% for number in page_obj.paginator.page_range %}
+
+                    {% if number == page_obj.number %}
+
+                        <span class="current">
+                            {{ number }}
+                        </span>
+
+                    {% elif number <= 3 or number > page_obj.paginator.num_pages|add:"-3" or number >= page_obj.number|add:"-2" and number <= page_obj.number|add:"2" %}
+
+                        <a
+                            href="?page={{ number }}"
+                            class="page-link"
+                            data-page="{{ number }}"
+                        >
+                            {{ number }}
+                        </a>
+
+                    {% elif number == 4 or number == page_obj.paginator.num_pages|add:"-3" %}
+
+                        <span>…</span>
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+                {% if page_obj.has_next %}
+
+                    <a
+                        href="?page={{ page_obj.next_page_number }}"
+                        class="page-link"
+                        data-page="{{ page_obj.next_page_number }}"
+                    >
+                        Next →
+                    </a>
+
+                {% else %}
+
+                    <span class="disabled">
+                        Next →
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+</main>
+
+
+<script>
+    /*
+     * Keep ALL active filters when changing pages.
+     *
+     * Django's pagination URLs normally contain only ?page=N.
+     * This small script changes those links to:
+     *
+     * ?search=...&disposition=...&page=N
+     *
+     * so filtering remains active while browsing pages.
+     */
+
+    (function () {
+        const links = document.querySelectorAll(".page-link");
+        const params = new URLSearchParams(window.location.search);
+
+        links.forEach(function (link) {
+            const page = link.dataset.page;
+
+            if (!page) {
+                return;
+            }
+
+            const newParams = new URLSearchParams(params);
+            newParams.set("page", page);
+
+            link.href = "?" + newParams.toString();
+        });
+    })();
+</script>
+
+</body>
+</html>

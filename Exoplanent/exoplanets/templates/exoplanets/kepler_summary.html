@@ -1,0 +1,281 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>NASA Kepler Summary | ExoVision</title>
+
+    <link rel="stylesheet" href="{% static 'exoplanets/css/style.css' %}">
+</head>
+
+<body>
+
+    <main class="kepler-summary-page">
+
+        <!-- NAVIGATION -->
+<nav class="kepler-navigation">
+
+    <a href="{% url 'home' %}" class="nav-back">
+        ← Home
+    </a>
+
+    <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'explorer' %}">Explorer</a>
+        <a href="{% url 'visualizations' %}">Visualizations</a>
+        <a href="{% url 'comparison' %}">Comparison</a>
+        <a href="{% url 'kepler_summary' %}">Kepler Summary</a>
+        <a href="{% url 'home' %}#about">About </a> 
+
+    </div>
+
+</nav>
+
+        <!-- PAGE HEADER -->
+        <header class="kepler-header">
+            <h1>NASA Kepler Mission</h1>
+            <p>Exploring Thousands of Worlds Beyond Earth</p>
+        </header>
+
+        <!-- MISSION INFORMATION -->
+<section class="kepler-stats">
+
+    <div class="kepler-stat-card">
+        <div class="stat-icon">🚀</div>
+        <h3>MISSION</h3>
+        <strong>2009 – 2018</strong>
+        <p>NASA's Kepler Space Telescope mission</p>
+    </div>
+
+    <div class="kepler-stat-card">
+        <div class="stat-icon">🔭</div>
+        <h3>METHOD</h3>
+        <strong>Transit Detection</strong>
+        <p>Detecting planets through changes in stellar brightness</p>
+    </div>
+
+    <div class="kepler-stat-card">
+        <div class="stat-icon">🪐</div>
+        <h3>DISCOVERIES</h3>
+        <strong>2,600+</strong>
+        <p>Confirmed exoplanets associated with the Kepler mission</p>
+    </div>
+
+</section>
+
+<!-- ABOUT KEPLER -->
+<section class="kepler-about">
+
+    <div class="section-label">ABOUT KEPLER</div>
+
+    <h2>The Planet Hunter</h2>
+
+    <p>
+        NASA's Kepler Space Telescope was designed to search for
+        exoplanets by monitoring the brightness of stars over time.
+        When a planet passes in front of its star, it can cause a
+        small decrease in the observed brightness.
+    </p>
+
+</section>
+
+<!-- KEPLER VIDEO -->
+<section class="kepler-video-section">
+
+    <div class="section-label">WATCH THE MISSION</div>
+
+    <h2>NASA Kepler Mission</h2>
+
+    <p class="video-description">
+        Learn how NASA's Kepler spacecraft searched for planets
+        beyond our Solar System using the transit method.
+    </p>
+
+    <div class="video-wrapper">
+
+<iframe
+    src="https://www.youtube.com/embed/U5Z5yh3GqvY"
+    title="NASA Kepler - First Earth-Size Planets"
+    frameborder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    allowfullscreen>
+</iframe>
+
+    </div>
+
+</section>
+
+<!-- MISSION TIMELINE -->
+<section class="kepler-timeline-section">
+
+    <div class="section-label">MISSION TIMELINE</div>
+
+    <h2>From Launch to Legacy</h2>
+
+    <div class="timeline">
+
+        <div class="timeline-item">
+            <div class="timeline-year">2009</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h3>Mission Launch</h3>
+                <p>
+                    NASA launched the Kepler Space Telescope
+                    to search for planets beyond our Solar System.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-year">2013</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h3>K2 Mission</h3>
+                <p>
+                    After the original mission faced spacecraft
+                    pointing limitations, Kepler continued its
+                    scientific work through the K2 mission.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-year">2014</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h3>Extended Exploration</h3>
+                <p>
+                    The K2 mission expanded Kepler's observations
+                    to additional regions of the sky.
+                </p>
+            </div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-year">2018</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h3>Mission End</h3>
+                <p>
+                    NASA retired the Kepler spacecraft after
+                    completing its planet-hunting mission.
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- WHAT KEPLER REVEALED -->
+<section class="kepler-discoveries-section">
+
+    <div class="section-label">WHAT KEPLER REVEALED</div>
+
+    <h2>Discoveries That Changed Exoplanet Science</h2>
+
+    <div class="discovery-grid">
+
+        <div class="discovery-card">
+            <span class="discovery-number">01</span>
+            <h3>Planets Are Common</h3>
+            <p>
+                Kepler observations showed that planets are widespread
+                throughout our galaxy.
+            </p>
+        </div>
+
+        <div class="discovery-card">
+            <span class="discovery-number">02</span>
+            <h3>Diverse Planetary Systems</h3>
+            <p>
+                The mission revealed a wide variety of planetary
+                systems and orbital configurations.
+            </p>
+        </div>
+
+        <div class="discovery-card">
+            <span class="discovery-number">03</span>
+            <h3>Small Planets Exist</h3>
+            <p>
+                Kepler helped identify many planets that are much
+                smaller than the gas giants of our Solar System.
+            </p>
+        </div>
+
+        <div class="discovery-card">
+            <span class="discovery-number">04</span>
+            <h3>New Worlds to Explore</h3>
+            <p>
+                Kepler dramatically expanded the catalog of known
+                planets beyond our Solar System.
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- YOUR DATASET -->
+<section class="kepler-dataset-section">
+
+    <div class="section-label">YOUR DATASET</div>
+
+    <h2>Kepler Dataset Used in ExoVision</h2>
+
+    <p class="dataset-intro">
+        The ExoVision application uses a Kepler exoplanet dataset
+        to analyze planetary characteristics, classifications,
+        and observational parameters.
+    </p>
+
+    <div class="dataset-stats">
+
+        <div class="dataset-stat-card">
+            <span class="dataset-value">9,564</span>
+            <span class="dataset-label">Records</span>
+        </div>
+
+        <div class="dataset-stat-card">
+            <span class="dataset-value">50</span>
+            <span class="dataset-label">Features</span>
+        </div>
+
+        <div class="dataset-stat-card">
+            <span class="dataset-value">2,293</span>
+            <span class="dataset-label">Confirmed</span>
+        </div>
+
+        <div class="dataset-stat-card">
+            <span class="dataset-value">2,248</span>
+            <span class="dataset-label">Candidates</span>
+        </div>
+
+        <div class="dataset-stat-card">
+            <span class="dataset-value">5,023</span>
+            <span class="dataset-label">False Positive</span>
+        </div>
+
+    </div>
+
+    <div class="dataset-note">
+        <strong>Key parameters analyzed:</strong>
+
+        <div class="parameter-list">
+            <span>KOI Disposition</span>
+            <span>Planet Radius</span>
+            <span>Equilibrium Temperature</span>
+            <span>Stellar Insolation</span>
+            <span>Orbital Period</span>
+        </div>
+    </div>
+
+</section>
+
+    </main>
+
+</body>
+</html>

@@ -1,0 +1,2287 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ExoPlanet | Visualizations</title>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg: #060a16;
+            --panel: rgba(14, 20, 40, .94);
+            --panel-2: #0b1124;
+            --border: rgba(255,255,255,.08);
+            --text: #eef2ff;
+            --muted: #8e99b2;
+
+            --purple: #8578ff;
+            --cyan: #48dfff;
+            --green: #4de0a2;
+            --yellow: #ffd166;
+            --red: #ff7180;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                ui-sans-serif,
+                system-ui,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 10% 5%,
+                    rgba(133,120,255,.16),
+                    transparent 30%
+                ),
+                radial-gradient(
+                    circle at 90% 15%,
+                    rgba(72,223,255,.10),
+                    transparent 28%
+                ),
+                var(--bg);
+        }
+
+        /* =====================================================
+           NAVBAR
+        ===================================================== */
+
+        .navbar {
+            height: 72px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 5%;
+
+            position: sticky;
+            top: 0;
+            z-index: 50;
+
+            background: rgba(6,10,22,.86);
+
+            backdrop-filter: blur(18px);
+
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 21px;
+            font-weight: 900;
+            letter-spacing: -.5px;
+        }
+
+        .logo span {
+            color: var(--purple);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 26px;
+        }
+
+        .nav-links a {
+            color: var(--muted);
+
+            text-decoration: none;
+
+            font-size: 14px;
+            font-weight: 800;
+
+            transition:
+                color .2s ease,
+                transform .2s ease;
+        }
+
+        .nav-links a:hover {
+            color: #fff;
+            transform: translateY(-1px);
+        }
+
+        .nav-links .active {
+            color: #fff;
+        }
+
+        /* =====================================================
+           MAIN CONTAINER
+        ===================================================== */
+
+        .container {
+            width: 94%;
+            max-width: 1550px;
+
+            margin: auto;
+
+            padding: 42px 0 70px;
+        }
+
+        /* =====================================================
+           HERO
+        ===================================================== */
+
+        .hero {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            margin-bottom: 9px;
+
+            color: var(--purple);
+
+            font-size: 11px;
+            font-weight: 900;
+
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+
+            font-size: clamp(34px, 5vw, 54px);
+
+            line-height: 1;
+
+            letter-spacing: -1.5px;
+        }
+
+        .gradient {
+            background: linear-gradient(
+                90deg,
+                #a095ff,
+                #48dfff
+            );
+
+            -webkit-background-clip: text;
+            background-clip: text;
+
+            color: transparent;
+        }
+
+        .hero p {
+            max-width: 850px;
+
+            margin: 0;
+
+            color: var(--muted);
+
+            line-height: 1.7;
+        }
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        .error {
+            margin-bottom: 20px;
+
+            padding: 16px 18px;
+
+            border:
+                1px solid rgba(255,113,128,.25);
+
+            border-radius: 15px;
+
+            background:
+                rgba(255,70,90,.08);
+
+            color: #ffb7c0;
+        }
+
+        /* =====================================================
+           STATISTICS
+        ===================================================== */
+
+        .stats {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            padding: 20px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 17px;
+
+            background: var(--panel);
+
+            box-shadow:
+                0 15px 45px rgba(0,0,0,.08);
+        }
+
+        .stat-label {
+            margin-bottom: 8px;
+
+            color: var(--muted);
+
+            font-size: 10px;
+            font-weight: 900;
+
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        /* =====================================================
+           CHART GRID
+        ===================================================== */
+
+        .chart-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 18px;
+        }
+
+        .chart-card {
+            min-width: 0;
+
+            padding: 20px;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 20px;
+
+            background: var(--panel);
+
+            box-shadow:
+                0 15px 45px rgba(0,0,0,.12);
+        }
+
+        .chart-card.wide {
+            grid-column: 1 / -1;
+        }
+
+        .chart-title {
+            margin-bottom: 4px;
+
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .chart-description {
+            min-height: 40px;
+
+            margin-bottom: 13px;
+
+            color: var(--muted);
+
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .chart-container {
+            position: relative;
+
+            width: 100%;
+            height: 340px;
+        }
+
+        .wide .chart-container {
+            height: 410px;
+        }
+
+        .empty-chart {
+            height: 100%;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border:
+                1px dashed var(--border);
+
+            border-radius: 12px;
+
+            color: var(--muted);
+
+            text-align: center;
+
+            padding: 20px;
+        }
+
+        .chart-footer {
+            display: flex;
+
+            justify-content: space-between;
+
+            gap: 10px;
+
+            margin-top: 12px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        .badge {
+            display: inline-flex;
+
+            padding: 5px 9px;
+
+            border-radius: 999px;
+
+            color: #cfd6ff;
+
+            background:
+                rgba(133,120,255,.11);
+
+            font-weight: 800;
+        }
+
+        /* =====================================================
+           RESPONSIVE
+        ===================================================== */
+
+        @media (max-width: 950px) {
+
+            .stats {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card.wide {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .nav-links {
+                gap: 13px;
+            }
+
+            .nav-links a {
+                font-size: 12px;
+            }
+
+            .container {
+                width: 92%;
+
+                padding-top: 30px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container,
+            .wide .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- =========================================================
+     NAVIGATION
+========================================================= -->
+
+<nav class="navbar">
+
+    <div class="logo">
+        Exo<span>Planet</span>
+    </div>
+
+    <div class="nav-links">
+
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'explorer' %}">Explorer</a>  
+        <a href="{% url 'visualizations' %}"class="active">Visualizations</a> 
+        <a href="{% url 'comparison' %}">Comparison</a>  
+
+    </div>
+
+</nav>
+
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
+
+<main class="container">
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="eyebrow">
+            KEPLER DATA ANALYTICS
+        </div>
+
+        <h1>
+            Exoplanet
+            <span class="gradient">
+                Visualizations
+            </span>
+        </h1>
+
+        <p>
+            Explore the structure of the Kepler catalogue through
+            interactive charts covering discovery status,
+            planetary radius, orbital period, temperature
+            and stellar properties.
+        </p>
+
+    </section>
+
+
+    <!-- =====================================================
+         ERROR MESSAGE
+    ====================================================== -->
+
+    {% if error %}
+
+        <div class="error">
+
+            <strong>
+                Dataset error:
+            </strong>
+
+            {{ error }}
+
+        </div>
+
+    {% endif %}
+
+
+    <!-- =====================================================
+         STATISTICS
+    ====================================================== -->
+
+    <section class="stats">
+
+        <div class="stat">
+
+            <div class="stat-label">
+                TOTAL OBJECTS
+            </div>
+
+            <div class="stat-value">
+                {{ total_objects|default:0 }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-label">
+                CONFIRMED
+            </div>
+
+            <div class="stat-value">
+                {{ confirmed|default:0 }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-label">
+                CANDIDATES
+            </div>
+
+            <div class="stat-value">
+                {{ candidates|default:0 }}
+            </div>
+
+        </div>
+
+
+        <div class="stat">
+
+            <div class="stat-label">
+                FALSE POSITIVE
+            </div>
+
+            <div class="stat-value">
+                {{ false_positive|default:0 }}
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         CHARTS
+    ====================================================== -->
+
+    <section class="chart-grid">
+
+
+        <!-- =================================================
+             1. DISCOVERY STATUS
+        ================================================== -->
+
+        <article class="chart-card">
+
+            <div class="chart-title">
+                Discovery Status
+            </div>
+
+            <div class="chart-description">
+                Distribution of confirmed planets,
+                candidates and false-positive detections.
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="dispositionChart"></canvas>
+
+            </div>
+
+            <div class="chart-footer">
+
+                <span>
+                    Dataset classification
+                </span>
+
+                <span class="badge">
+                    Distribution
+                </span>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             2. PLANET RADIUS
+        ================================================== -->
+
+        <article class="chart-card">
+
+            <div class="chart-title">
+                Planet Radius Distribution
+            </div>
+
+            <div class="chart-description">
+                Distribution of measured planetary radius
+                in Earth-radius units.
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="radiusChart"></canvas>
+
+            </div>
+
+            <div class="chart-footer">
+
+                <span>
+                    koi_prad
+                </span>
+
+                <span class="badge">
+                    R⊕
+                </span>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             3. ORBITAL PERIOD
+        ================================================== -->
+
+        <article class="chart-card">
+
+            <div class="chart-title">
+                Orbital Period Distribution
+            </div>
+
+            <div class="chart-description">
+                Distribution of orbital periods
+                measured in days.
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="periodChart"></canvas>
+
+            </div>
+
+            <div class="chart-footer">
+
+                <span>
+                    koi_period
+                </span>
+
+                <span class="badge">
+                    Days
+                </span>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             4. TEMPERATURE
+        ================================================== -->
+
+        <article class="chart-card">
+
+            <div class="chart-title">
+                Equilibrium Temperature
+            </div>
+
+            <div class="chart-description">
+                Distribution of estimated planetary
+                equilibrium temperature.
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="temperatureChart"></canvas>
+
+            </div>
+
+            <div class="chart-footer">
+
+                <span>
+                    koi_teq
+                </span>
+
+                <span class="badge">
+                    Kelvin
+                </span>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             5. PERIOD VS RADIUS
+        ================================================== -->
+
+        <article class="chart-card wide">
+
+            <div class="chart-title">
+                Orbital Period vs Planet Radius
+            </div>
+
+            <div class="chart-description">
+                Interactive scatter plot showing the relationship
+                between orbital period and planetary radius.
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="periodRadiusChart"></canvas>
+
+            </div>
+
+            <div class="chart-footer">
+
+                <span>
+                    X: orbital period · Y: planet radius
+                </span>
+
+                <span class="badge">
+                    Scatter
+                </span>
+
+            </div>
+
+        </article>
+
+
+        <!-- =================================================
+             6. STELLAR PROPERTIES
+        ================================================== -->
+
+        <article class="chart-card wide">
+
+            <div class="chart-title">
+                Stellar Temperature vs Stellar Radius
+            </div>
+
+            <div class="chart-description">
+                Explore the relationship between host-star
+                effective temperature and stellar radius.
+            </div>
+
+            <div class="chart-container">
+
+                <canvas id="stellarChart"></canvas>
+
+            </div>
+
+            <div class="chart-footer">
+
+                <span>
+                    X: stellar temperature · Y: stellar radius
+                </span>
+
+                <span class="badge">
+                    Scatter
+                </span>
+
+            </div>
+
+        </article>
+
+    </section>
+
+</main>
+
+
+<!-- =========================================================
+     DJANGO JSON DATA
+
+     IMPORTANT:
+     json_script safely serializes the Python dictionary.
+========================================================= -->
+
+{{ visualization_data|json_script:"visualization-data" }}
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script>
+
+"use strict";
+
+
+/* ============================================================
+   GET DJANGO DATA
+============================================================ */
+
+const dataElement =
+    document.getElementById("visualization-data");
+
+
+let rawChartData = {};
+
+
+if (dataElement) {
+
+    try {
+
+        rawChartData =
+            JSON.parse(
+                dataElement.textContent
+            );
+
+    } catch (error) {
+
+        console.error(
+            "Could not parse Django visualization data:",
+            error
+        );
+
+        rawChartData = {};
+
+    }
+
+} else {
+
+    console.error(
+        "Element #visualization-data was not found."
+    );
+
+}
+
+
+console.log(
+    "RAW CHART DATA:",
+    rawChartData
+);
+
+
+/* ============================================================
+   SAFE ARRAY PARSER
+============================================================ */
+
+/*
+    This function supports BOTH:
+
+        [1, 2, 3]
+
+    and:
+
+        "[1, 2, 3]"
+
+    This is important because the current views.py
+    sends the visualization arrays as JSON strings.
+*/
+
+function parseChartArray(value, name) {
+
+    /* Already an array */
+    if (Array.isArray(value)) {
+
+        return value;
+
+    }
+
+
+    /* JSON string */
+    if (typeof value === "string") {
+
+        try {
+
+            const parsed =
+                JSON.parse(value);
+
+            if (Array.isArray(parsed)) {
+
+                return parsed;
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Could not parse " + name,
+                error
+            );
+
+        }
+
+    }
+
+
+    console.warn(
+        "No valid array found for:",
+        name,
+        value
+    );
+
+    return [];
+
+}
+
+
+/* ============================================================
+   NORMALIZED CHART DATA
+============================================================ */
+
+const chartData = {
+
+    disposition_labels:
+        parseChartArray(
+            rawChartData.disposition_labels,
+            "disposition_labels"
+        ),
+
+    disposition_values:
+        parseChartArray(
+            rawChartData.disposition_values,
+            "disposition_values"
+        ),
+
+    radius_data:
+        parseChartArray(
+            rawChartData.radius_data,
+            "radius_data"
+        ),
+
+    period_data:
+        parseChartArray(
+            rawChartData.period_data,
+            "period_data"
+        ),
+
+    temperature_data:
+        parseChartArray(
+            rawChartData.temperature_data,
+            "temperature_data"
+        ),
+
+    scatter_period:
+        parseChartArray(
+            rawChartData.scatter_period,
+            "scatter_period"
+        ),
+
+    scatter_radius:
+        parseChartArray(
+            rawChartData.scatter_radius,
+            "scatter_radius"
+        ),
+
+    stellar_temperature:
+        parseChartArray(
+            rawChartData.stellar_temperature,
+            "stellar_temperature"
+        ),
+
+    stellar_radius:
+        parseChartArray(
+            rawChartData.stellar_radius,
+            "stellar_radius"
+        )
+
+};
+
+
+console.log(
+    "NORMALIZED CHART DATA:",
+    chartData
+);
+
+
+/* ============================================================
+   DEBUG COUNTS
+============================================================ */
+
+console.log(
+    "Disposition:",
+    chartData.disposition_labels.length,
+    chartData.disposition_values.length
+);
+
+console.log(
+    "Radius:",
+    chartData.radius_data.length
+);
+
+console.log(
+    "Period:",
+    chartData.period_data.length
+);
+
+console.log(
+    "Temperature:",
+    chartData.temperature_data.length
+);
+
+console.log(
+    "Period/Radius:",
+    chartData.scatter_period.length,
+    chartData.scatter_radius.length
+);
+
+console.log(
+    "Stellar:",
+    chartData.stellar_temperature.length,
+    chartData.stellar_radius.length
+);
+
+
+/* ============================================================
+   FINITE NUMBER HELPER
+============================================================ */
+
+function finiteNumbers(values) {
+
+    if (!Array.isArray(values)) {
+
+        return [];
+
+    }
+
+
+    return values
+
+        .map(function (value) {
+
+            return Number(value);
+
+        })
+
+        .filter(function (value) {
+
+            return Number.isFinite(value);
+
+        });
+
+}
+
+
+/* ============================================================
+   EMPTY CHART
+============================================================ */
+
+function showEmpty(canvasId, message) {
+
+    const canvas =
+        document.getElementById(canvasId);
+
+
+    if (!canvas) {
+
+        console.warn(
+            "Canvas not found:",
+            canvasId
+        );
+
+        return;
+
+    }
+
+
+    const parent =
+        canvas.parentElement;
+
+
+    if (!parent) {
+
+        return;
+
+    }
+
+
+    canvas.style.display = "none";
+
+
+    /*
+       Prevent duplicate empty messages.
+    */
+
+    const existing =
+        parent.querySelector(
+            ".empty-chart"
+        );
+
+
+    if (existing) {
+
+        existing.textContent =
+            message;
+
+        return;
+
+    }
+
+
+    const empty =
+        document.createElement("div");
+
+
+    empty.className =
+        "empty-chart";
+
+
+    empty.textContent =
+        message;
+
+
+    parent.appendChild(empty);
+
+}
+
+
+/* ============================================================
+   COMMON CHART OPTIONS
+============================================================ */
+
+function commonOptions() {
+
+    return {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        animation: {
+
+            duration: 650
+
+        },
+
+        interaction: {
+
+            mode: "nearest",
+
+            intersect: false
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                labels: {
+
+                    color: "#bfc8db",
+
+                    font: {
+
+                        size: 11,
+
+                        weight: "600"
+
+                    }
+
+                }
+
+            },
+
+            tooltip: {
+
+                backgroundColor:
+                    "#0a1022",
+
+                borderColor:
+                    "rgba(255,255,255,.1)",
+
+                borderWidth: 1,
+
+                titleColor:
+                    "#fff",
+
+                bodyColor:
+                    "#cbd4e7",
+
+                padding: 10
+
+            }
+
+        },
+
+        scales: {
+
+            x: {
+
+                grid: {
+
+                    color:
+                        "rgba(255,255,255,.055)"
+
+                },
+
+                ticks: {
+
+                    color:
+                        "#7f8aa3",
+
+                    maxTicksLimit: 9
+
+                },
+
+                border: {
+
+                    color:
+                        "rgba(255,255,255,.08)"
+
+                }
+
+            },
+
+            y: {
+
+                grid: {
+
+                    color:
+                        "rgba(255,255,255,.055)"
+
+                },
+
+                ticks: {
+
+                    color:
+                        "#7f8aa3",
+
+                    maxTicksLimit: 8
+
+                },
+
+                border: {
+
+                    color:
+                        "rgba(255,255,255,.08)"
+
+                }
+
+            }
+
+        }
+
+    };
+
+}
+
+
+/* ============================================================
+   NUMBER FORMATTER
+============================================================ */
+
+function formatNumber(value) {
+
+    if (value >= 1000) {
+
+        return value.toLocaleString(
+            undefined,
+            {
+                maximumFractionDigits: 0
+            }
+        );
+
+    }
+
+
+    if (value >= 10) {
+
+        return value.toFixed(1);
+
+    }
+
+
+    return value.toFixed(2);
+
+}
+
+
+/* ============================================================
+   HISTOGRAM
+============================================================ */
+
+function histogram(
+    values,
+    binCount = 16
+) {
+
+    values =
+        finiteNumbers(values)
+        .filter(function (value) {
+
+            return value > 0;
+
+        });
+
+
+    if (!values.length) {
+
+        return null;
+
+    }
+
+
+    let min =
+        Math.min.apply(
+            null,
+            values
+        );
+
+
+    let max =
+        Math.max.apply(
+            null,
+            values
+        );
+
+
+    /*
+       If every value is identical.
+    */
+
+    if (min === max) {
+
+        return {
+
+            labels: [
+                formatNumber(min)
+            ],
+
+            counts: [
+                values.length
+            ]
+
+        };
+
+    }
+
+
+    const logMin =
+        Math.log10(min);
+
+
+    const logMax =
+        Math.log10(max);
+
+
+    const step =
+        (logMax - logMin) /
+        binCount;
+
+
+    const counts =
+        new Array(binCount)
+        .fill(0);
+
+
+    const labels = [];
+
+
+    /*
+       Create logarithmic bins.
+    */
+
+    for (
+        let i = 0;
+        i < binCount;
+        i++
+    ) {
+
+        const lower =
+            Math.pow(
+                10,
+                logMin + i * step
+            );
+
+
+        const upper =
+            Math.pow(
+                10,
+                logMin + (i + 1) * step
+            );
+
+
+        labels.push(
+
+            formatNumber(lower) +
+            "–" +
+            formatNumber(upper)
+
+        );
+
+    }
+
+
+    /*
+       Put every value into a bin.
+    */
+
+    values.forEach(
+        function (value) {
+
+            let index =
+                Math.floor(
+                    (
+                        Math.log10(value)
+                        - logMin
+                    ) / step
+                );
+
+
+            if (index >= binCount) {
+
+                index =
+                    binCount - 1;
+
+            }
+
+
+            if (index >= 0) {
+
+                counts[index]++;
+
+            }
+
+        }
+    );
+
+
+    return {
+
+        labels: labels,
+
+        counts: counts
+
+    };
+
+}
+
+
+/* ============================================================
+   MAKE HISTOGRAM
+============================================================ */
+
+function makeHistogram(
+    canvasId,
+    values,
+    label
+) {
+
+    const histogramData =
+        histogram(values);
+
+
+    if (!histogramData) {
+
+        showEmpty(
+            canvasId,
+            "No numeric data available."
+        );
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.getElementById(canvasId);
+
+
+    if (!canvas) {
+
+        console.error(
+            "Canvas not found:",
+            canvasId
+        );
+
+        return;
+
+    }
+
+
+    const baseOptions =
+        commonOptions();
+
+
+    new Chart(
+
+        canvas,
+
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels:
+                    histogramData.labels,
+
+                datasets: [
+
+                    {
+
+                        label: label,
+
+                        data:
+                            histogramData.counts,
+
+                        backgroundColor:
+                            "rgba(133,120,255,.58)",
+
+                        borderColor:
+                            "#8578ff",
+
+                        borderWidth: 1,
+
+                        borderRadius: 5
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...baseOptions,
+
+                plugins: {
+
+                    ...baseOptions.plugins,
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+                scales: {
+
+                    ...baseOptions.scales,
+
+                    x: {
+
+                        ...baseOptions.scales.x,
+
+                        ticks: {
+
+                            color:
+                                "#7f8aa3",
+
+                            maxRotation: 35,
+
+                            minRotation: 20,
+
+                            maxTicksLimit: 8
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+}
+
+
+/* ============================================================
+   1. DISCOVERY STATUS
+============================================================ */
+
+(function () {
+
+    const labels =
+        Array.isArray(
+            chartData.disposition_labels
+        )
+            ? chartData.disposition_labels
+            : [];
+
+
+    const values =
+        finiteNumbers(
+            chartData.disposition_values
+        );
+
+
+    console.log(
+        "Discovery labels:",
+        labels
+    );
+
+    console.log(
+        "Discovery values:",
+        values
+    );
+
+
+    if (
+        labels.length === 0 ||
+        values.length === 0
+    ) {
+
+        showEmpty(
+            "dispositionChart",
+            "No discovery-status data available."
+        );
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "dispositionChart"
+        );
+
+
+    if (!canvas) {
+
+        return;
+
+    }
+
+
+    new Chart(
+
+        canvas,
+
+        {
+
+            type: "doughnut",
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+
+                        data: values,
+
+                        backgroundColor: [
+
+                            "#4de0a2",
+                            "#ffd166",
+                            "#ff7180",
+                            "#8578ff"
+
+                        ],
+
+                        borderColor:
+                            "#0e1428",
+
+                        borderWidth: 4,
+
+                        hoverOffset: 8
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                cutout: "66%",
+
+                plugins: {
+
+                    legend: {
+
+                        position: "bottom",
+
+                        labels: {
+
+                            color:
+                                "#c2cbdd",
+
+                            padding: 17,
+
+                            usePointStyle:
+                                true,
+
+                            font: {
+
+                                size: 11,
+
+                                weight: "700"
+
+                            }
+
+                        }
+
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label:
+                                function (
+                                    context
+                                ) {
+
+                                    const value =
+                                        Number(
+                                            context.raw
+                                        ) || 0;
+
+
+                                    const total =
+                                        context
+                                            .dataset
+                                            .data
+                                            .reduce(
+
+                                                function (
+                                                    sum,
+                                                    item
+                                                ) {
+
+                                                    return (
+                                                        sum +
+                                                        Number(item)
+                                                    );
+
+                                                },
+
+                                                0
+
+                                            );
+
+
+                                    const percentage =
+                                        total > 0
+
+                                            ? (
+                                                value /
+                                                total *
+                                                100
+                                            ).toFixed(1)
+
+                                            : "0.0";
+
+
+                                    return (
+                                        " " +
+                                        context.label +
+                                        ": " +
+                                        value.toLocaleString() +
+                                        " (" +
+                                        percentage +
+                                        "%)"
+                                    );
+
+                                }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+})();
+
+
+/* ============================================================
+   2. PLANET RADIUS
+============================================================ */
+
+makeHistogram(
+
+    "radiusChart",
+
+    chartData.radius_data,
+
+    "Planets"
+
+);
+
+
+/* ============================================================
+   3. ORBITAL PERIOD
+============================================================ */
+
+makeHistogram(
+
+    "periodChart",
+
+    chartData.period_data,
+
+    "Planets"
+
+);
+
+
+/* ============================================================
+   4. EQUILIBRIUM TEMPERATURE
+============================================================ */
+
+makeHistogram(
+
+    "temperatureChart",
+
+    chartData.temperature_data,
+
+    "Planets"
+
+);
+
+
+/* ============================================================
+   5. ORBITAL PERIOD VS PLANET RADIUS
+============================================================ */
+
+(function () {
+
+    const x =
+        finiteNumbers(
+            chartData.scatter_period
+        );
+
+
+    const y =
+        finiteNumbers(
+            chartData.scatter_radius
+        );
+
+
+    console.log(
+        "PERIOD X:",
+        x.length,
+        x
+    );
+
+    console.log(
+        "RADIUS Y:",
+        y.length,
+        y
+    );
+
+
+    /*
+       IMPORTANT:
+       Do NOT check stellarChart here.
+       This block belongs to periodRadiusChart.
+    */
+
+    const length =
+        Math.min(
+            x.length,
+            y.length
+        );
+
+
+    if (length === 0) {
+
+        showEmpty(
+            "periodRadiusChart",
+            "No period/radius data available."
+        );
+
+        return;
+
+    }
+
+
+    const points = [];
+
+
+    for (
+        let i = 0;
+        i < length;
+        i++
+    ) {
+
+        if (
+            x[i] > 0 &&
+            y[i] > 0
+        ) {
+
+            points.push({
+
+                x: x[i],
+
+                y: y[i]
+
+            });
+
+        }
+
+    }
+
+
+    if (!points.length) {
+
+        showEmpty(
+            "periodRadiusChart",
+            "No valid period/radius points available."
+        );
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "periodRadiusChart"
+        );
+
+
+    if (!canvas) {
+
+        return;
+
+    }
+
+
+    const baseOptions =
+        commonOptions();
+
+
+    new Chart(
+
+        canvas,
+
+        {
+
+            type: "scatter",
+
+            data: {
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Exoplanets",
+
+                        data:
+                            points,
+
+                        backgroundColor:
+                            "rgba(72,223,255,.52)",
+
+                        borderColor:
+                            "#48dfff",
+
+                        pointRadius: 3,
+
+                        pointHoverRadius: 6
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...baseOptions,
+
+                scales: {
+
+                    x: {
+
+                        ...baseOptions.scales.x,
+
+                        type:
+                            "logarithmic",
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Orbital Period (days)",
+
+                            color:
+                                "#9aa6bd",
+
+                            font: {
+
+                                weight:
+                                    "700"
+
+                            }
+
+                        }
+
+                    },
+
+                    y: {
+
+                        ...baseOptions.scales.y,
+
+                        type:
+                            "logarithmic",
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Planet Radius (R⊕)",
+
+                            color:
+                                "#9aa6bd",
+
+                            font: {
+
+                                weight:
+                                    "700"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+})();
+
+
+/* ============================================================
+   6. STELLAR TEMPERATURE VS STELLAR RADIUS
+============================================================ */
+
+(function () {
+
+    const x =
+        finiteNumbers(
+            chartData.stellar_temperature
+        );
+
+
+    const y =
+        finiteNumbers(
+            chartData.stellar_radius
+        );
+
+
+    console.log(
+        "STELLAR TEMPERATURE X:",
+        x.length,
+        x
+    );
+
+
+    console.log(
+        "STELLAR RADIUS Y:",
+        y.length,
+        y
+    );
+
+
+    /*
+       Make sure both arrays exist and contain data.
+    */
+
+    const length =
+        Math.min(
+            x.length,
+            y.length
+        );
+
+
+    if (length === 0) {
+
+        showEmpty(
+            "stellarChart",
+            "No stellar-property data available."
+        );
+
+        return;
+
+    }
+
+
+    const points = [];
+
+
+    for (
+        let i = 0;
+        i < length;
+        i++
+    ) {
+
+        if (
+            x[i] > 0 &&
+            y[i] > 0
+        ) {
+
+            points.push({
+
+                x: x[i],
+
+                y: y[i]
+
+            });
+
+        }
+
+    }
+
+
+    if (!points.length) {
+
+        showEmpty(
+            "stellarChart",
+            "No valid stellar-property points available."
+        );
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "stellarChart"
+        );
+
+
+    if (!canvas) {
+
+        return;
+
+    }
+
+
+    const baseOptions =
+        commonOptions();
+
+
+    new Chart(
+
+        canvas,
+
+        {
+
+            type: "scatter",
+
+            data: {
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Host Stars",
+
+                        data:
+                            points,
+
+                        backgroundColor:
+                            "rgba(255,209,102,.48)",
+
+                        borderColor:
+                            "#ffd166",
+
+                        pointRadius: 3,
+
+                        pointHoverRadius: 6
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                ...baseOptions,
+
+                scales: {
+
+                    x: {
+
+                        ...baseOptions.scales.x,
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Stellar Temperature (K)",
+
+                            color:
+                                "#9aa6bd",
+
+                            font: {
+
+                                weight:
+                                    "700"
+
+                            }
+
+                        }
+
+                    },
+
+                    y: {
+
+                        ...baseOptions.scales.y,
+
+                        title: {
+
+                            display: true,
+
+                            text:
+                                "Stellar Radius (R☉)",
+
+                            color:
+                                "#9aa6bd",
+
+                            font: {
+
+                                weight:
+                                    "700"
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+})();
+
+
+/* ============================================================
+   FINAL DEBUG MESSAGE
+============================================================ */
+
+console.log(
+    "================================================"
+);
+
+console.log(
+    "EXOPLANET VISUALIZATION INITIALIZATION COMPLETE"
+);
+
+console.log(
+    "================================================"
+);
+
+</script>
+
+</body>
+</html>
